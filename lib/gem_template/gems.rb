@@ -6,6 +6,7 @@ unless defined?(GemTemplate::Gems)
     class Gems
     
       VERSIONS = {
+        :'spec-framework' => '0.1.0',
         :rake => '=0.8.7',
         :rspec => '=1.3.1'
       }
@@ -15,7 +16,7 @@ unless defined?(GemTemplate::Gems)
         :gemspec_dev => [ :rspec ],
         :lib => [],
         :rake => [ :rake, :rspec ],
-        :spec => [ :rspec ]
+        :spec => [ :rspec, :'spec-framework' ]
       }
       
       class <<self

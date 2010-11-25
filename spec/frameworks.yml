@@ -1,0 +1,13 @@
+rails:
+  <3:
+    - fixtures/rails2/app/controllers/application_controller.rb
+    - fixtures/rails2/config/environment.rb
+    - fixtures/rails2/config/routes.rb
+  <4:
+    - fixtures/rails3/app/controllers/application_controller.rb
+    - fixtures/rails3/config/application.rb
+    - fixtures/rails3/config/routes.rb
+    - fixtures/rails3/Gemfile
+sinatra:
+  <1: fixtures/sinatra.rb
+  <2: fixtures/sinatra.rb

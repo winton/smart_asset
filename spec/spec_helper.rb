@@ -3,6 +3,8 @@ require "#{$root}/lib/gem_template/gems"
 
 GemTemplate::Gems.require(:spec)
 
+require 'spec-framework'
+
 require "#{$root}/lib/gem_template"
 require 'pp'
 
