@@ -1,9 +1,14 @@
 $root = File.expand_path('../../', __FILE__)
 require "#{$root}/lib/gem_template/gems"
 
+GemTemplate::Gems.require(:spec_first)
+
+require 'framework_fixture'
+
+FrameworkFixture.generate File.dirname(__FILE__) + '/fixtures'
 GemTemplate::Gems.require(:spec)
 
-require 'spec-framework'
+require 'rack/test'
 
 require "#{$root}/lib/gem_template"
 require 'pp'

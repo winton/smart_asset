@@ -1,12 +1,12 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../spec_helper")
 
-if SpecFramework.rails == '<3'
+if FrameworkFixture.rails == '<3'
   describe GemTemplate::Adapters::Rails2 do
 
     include Rack::Test::Methods
 
     def app
-      ActionController::Dispatcher.new
+      FrameworkFixture.app.call
     end
   
     it "should have a pulse" do

@@ -1,12 +1,12 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../spec_helper")
 
-if SpecFramework.sinatra
+if FrameworkFixture.sinatra
   describe GemTemplate::Adapters::Sinatra do
 
     include Rack::Test::Methods
 
     def app
-      Application.new
+      FrameworkFixture.app.call
     end
   
     it "should have a pulse" do

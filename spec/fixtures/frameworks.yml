@@ -1,0 +1,19 @@
+rails:
+  <3:
+    rails2:
+      - app/controllers/application_controller.rb
+      - config/environment.rb
+      - config/routes.rb
+  <4:
+    rails3:
+      - app/controllers/application_controller.rb
+      - config/application.rb
+      - config/routes.rb
+      - Gemfile
+sinatra:
+  <1:
+    sinatra:
+      - application.rb
+  <2:
+    sinatra:
+      - application.rb
