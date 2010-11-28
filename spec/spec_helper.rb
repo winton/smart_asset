@@ -1,16 +1,16 @@
 $root = File.expand_path('../../', __FILE__)
-require "#{$root}/lib/gem_template/gems"
+require "#{$root}/lib/smart_asset/gems"
 
-GemTemplate::Gems.require(:spec_first)
+SmartAsset::Gems.require(:spec_first)
 
 require 'framework_fixture'
 
 FrameworkFixture.generate File.dirname(__FILE__) + '/fixtures'
-GemTemplate::Gems.require(:spec)
+SmartAsset::Gems.require(:spec)
 
 require 'rack/test'
 
-require "#{$root}/lib/gem_template"
+require "#{$root}/lib/smart_asset"
 require 'pp'
 
 Spec::Runner.configure do |config|

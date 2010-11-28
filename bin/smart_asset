@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(File.dirname(__FILE__) + "/../lib/smart_asset")
+
+SmartAsset.compress(ARGV[0] || Dir.pwd, ARGV[1])

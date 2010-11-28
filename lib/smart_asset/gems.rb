@@ -1,8 +1,8 @@
-unless defined?(GemTemplate::Gems)
+unless defined?(SmartAsset::Gems)
   
   require 'rubygems'
   
-  module GemTemplate
+  class SmartAsset
     class Gems
     
       VERSIONS = {

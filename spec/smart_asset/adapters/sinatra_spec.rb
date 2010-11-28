@@ -1,7 +1,7 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../spec_helper")
 
-if FrameworkFixture.rails == '<4'
-  describe GemTemplate::Adapters::Rails3 do
+if FrameworkFixture.sinatra
+  describe SmartAsset::Adapters::Sinatra do
 
     include Rack::Test::Methods
 

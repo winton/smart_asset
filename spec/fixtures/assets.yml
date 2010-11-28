@@ -1,0 +1,11 @@
+to: spec/fixtures/assets/compressed
+javascripts:
+  spec/fixtures/assets/javascripts:
+    package:
+      - jquery
+      - underscore
+stylesheets:
+  spec/fixtures/assets/stylesheets:
+    package:
+      - blueprint
+      - 960

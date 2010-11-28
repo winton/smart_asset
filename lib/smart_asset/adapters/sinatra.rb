@@ -1,4 +1,4 @@
-module GemTemplate
+class SmartAsset
   module Adapters
     module Sinatra
       
@@ -8,4 +8,4 @@ module GemTemplate
   end
 end
 
-# Sinatra::Base.send(:include, GemTemplate)
+# Sinatra::Base.send(:include, SmartAsset)

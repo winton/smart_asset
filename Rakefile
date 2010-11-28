@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/lib/gem_template/gems'
+require File.dirname(__FILE__) + '/lib/smart_asset/gems'
 
-GemTemplate::Gems.require(:rake)
+SmartAsset::Gems.require(:rake)
 
 require 'rake'
 require 'rake/gempackagetask'
@@ -8,7 +8,7 @@ require 'spec/rake/spectask'
 
 def gemspec
   @gemspec ||= begin
-    file = File.expand_path('../gem_template.gemspec', __FILE__)
+    file = File.expand_path('../smart_asset.gemspec', __FILE__)
     eval(File.read(file), binding, file)
   end
 end
@@ -47,10 +47,10 @@ namespace :gems do
         end
       end
     else
-      gems = GemTemplate::Gems::TYPES[:gemspec]
-      gems = GemTemplate::Gems::TYPES[:gemspec_dev] if ENV['DEV'] == '1'
+      gems = SmartAsset::Gems::TYPES[:gemspec]
+      gems = SmartAsset::Gems::TYPES[:gemspec_dev] if ENV['DEV'] == '1'
       gems.collect! do |g|
-        [ g.to_s, GemTemplate::Gems::VERSIONS[g] ]
+        [ g.to_s, SmartAsset::Gems::VERSIONS[g] ]
       end
     end
     
@@ -85,19 +85,19 @@ task :rename do
   camelize = lambda do |str|
     str.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
   end
-  dir = Dir['**/gem_template*']
+  dir = Dir['**/smart_asset*']
   begin
     from = dir.pop
     if from
       to = from.split('/')
-      to[-1].gsub!('gem_template', name)
+      to[-1].gsub!('smart_asset', name)
       FileUtils.mv(from, to.join('/'))
     end
   end while dir.length > 0
   Dir["**/*"].each do |path|
     if File.file?(path)
-      `sed -i '' 's/gem_template/#{name}/g' #{path}`
-      `sed -i '' 's/GemTemplate/#{camelize.call(name)}/g' #{path}`
+      `sed -i '' 's/smart_asset/#{name}/g' #{path}`
+      `sed -i '' 's/SmartAsset/#{camelize.call(name)}/g' #{path}`
       no_space = File.read(path).gsub(/\s+\z/, '')
       File.open(path, 'w') { |f| f.write(no_space) }
     end
