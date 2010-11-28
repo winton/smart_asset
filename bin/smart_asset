@@ -2,4 +2,4 @@
 
 require File.expand_path(File.dirname(__FILE__) + "/../lib/smart_asset")
 
-SmartAsset.compress(ARGV[0] || Dir.pwd, ARGV[1])
+SmartAsset.binary(ARGV[0] || Dir.pwd, ARGV[1])

@@ -28,10 +28,10 @@ describe SmartAsset do
     end
   end
   
-  describe :compress do
+  describe :binary do
     
     before(:all) do
-      SmartAsset.compress $root, @config
+      SmartAsset.binary $root, @config
     end
     
     it "should" do
