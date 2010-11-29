@@ -12,6 +12,7 @@ require 'rack/test'
 
 require "#{$root}/lib/smart_asset"
 require 'pp'
+require 'stringio'
 
 Spec::Runner.configure do |config|
 end
@@ -21,4 +22,14 @@ def debug(object)
   puts "<pre>"
   puts object.pretty_inspect.gsub('<', '&lt;').gsub('>', '&gt;')
   puts "</pre>"
+end
+
+def capture_stdout
+  old = $stdout
+  out = StringIO.new
+  $stdout = out
+  yield
+  return out
+ensure
+  $stdout = old
 end

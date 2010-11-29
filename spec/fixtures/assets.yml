@@ -4,8 +4,16 @@ javascripts:
     package:
       - jquery
       - underscore
+      - does_not_exist
+    empty_package:
+    non_existent_package:
+      - does_not_exist
 stylesheets:
   spec/fixtures/assets/stylesheets:
     package:
       - blueprint
       - 960
+      - does_not_exist
+    empty_package:
+    non_existent_package:
+      - does_not_exist

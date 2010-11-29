@@ -31,24 +31,26 @@ class SmartAsset
         packages.each do |package, files|
           create_package = false
           compressed = {}
-          files.each do |file|
-            if File.exists?(source = "#{dir}/#{file}.#{ext}")
-              modified = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{relative_dir}/#{file}.#{ext}`
-              next if modified.empty?
-              modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
-              unless File.exists?(destination = "#{@dest}/#{modified}_#{prefix}_#{file}.#{ext}")
-                create_package = true
-                Dir["#{@dest}/*_#{prefix}_#{file}.#{ext}"].each do |old|
-                  FileUtils.rm old
+          if files
+            files.each do |file|
+              if File.exists?(source = "#{dir}/#{file}.#{ext}")
+                modified = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{relative_dir}/#{file}.#{ext}`
+                next if modified.empty?
+                modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
+                unless File.exists?(destination = "#{@dest}/#{modified}_#{prefix}_#{file}.#{ext}")
+                  create_package = true
+                  Dir["#{@dest}/*_#{prefix}_#{file}.#{ext}"].each do |old|
+                    FileUtils.rm old
+                  end
+                  puts "\nCompressing #{source}..."
+                  if ext == 'js'
+                    `java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination} --warning_level QUIET`
+                  elsif ext == 'css'
+                    `java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}`
+                  end
                 end
-                puts "\nCompressing #{source}..."
-                if ext == 'js'
-                  `java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination} --warning_level QUIET`
-                elsif ext == 'css'
-                  `java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}`
-                end
+                compressed[destination] = modified
               end
-              compressed[destination] = modified
             end
           end
           if modified = compressed.values.compact.sort.last
