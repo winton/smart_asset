@@ -11,4 +11,7 @@ class ApplicationController < ActionController::Base
   def pulse
     render :text => '1'
   end
+  
+  def test
+  end
 end

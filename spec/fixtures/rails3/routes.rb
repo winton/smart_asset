@@ -57,4 +57,5 @@ Rails3::Application.routes.draw do
   # match ':controller(/:action(/:id(.:format)))'
   
   match 'pulse' => 'application#pulse'
+  match 'test' => 'application#test'
 end

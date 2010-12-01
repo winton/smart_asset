@@ -1,130 +1,216 @@
 require 'spec_helper'
 
-describe SmartAsset do
+unless FrameworkFixture.framework
+  describe SmartAsset do
   
-  before(:all) do
-    @config = "spec/fixtures/assets.yml"
-  end
-  
-  describe :load_config do
-    
     before(:all) do
-      SmartAsset.load_config($root, @config)
+      @config = "spec/fixtures/assets.yml"
     end
-    
-    it "should populate @root" do
-      SmartAsset.root.should == $root
-    end
-    
-    it "should populate @config" do
-      SmartAsset.config.should == {"to"=>"spec/fixtures/assets/compressed",
-       "javascripts"=>
-        {"spec/fixtures/assets/javascripts"=>
-          {"package"=>["jquery", "underscore", "does_not_exist"],
-           "empty_package"=>nil,
-           "non_existent_package"=>["does_not_exist"]}},
-       "stylesheets"=>
-        {"spec/fixtures/assets/stylesheets"=>
-          {"package"=>["blueprint", 960, "does_not_exist"],
-           "empty_package"=>nil,
-           "non_existent_package"=>["does_not_exist"]}}}
-    end
-    
-    it "should populate @dest" do
-      SmartAsset.dest.should == "#{$root}/spec/fixtures/assets/compressed"
-    end
-  end
   
-  describe :binary do
+    describe :load_config do
     
-    before(:all) do
-      @dest = "#{$root}/spec/fixtures/assets/compressed"
-      @version = '20101128112833'
-      @old_version = '20101128112832'
-      @files = %w(
-        package.css
-        package.js
-        spec_fixtures_assets_javascripts_jquery.js
-        spec_fixtures_assets_javascripts_underscore.js
-        spec_fixtures_assets_stylesheets_960.css
-        spec_fixtures_assets_stylesheets_blueprint.css
-      )
-    end
-    
-    describe 'no compressed assets' do
-      
       before(:all) do
-        FileUtils.rm_rf @dest
-        @output = capture_stdout do
-          SmartAsset.binary $root, @config
-        end
+        SmartAsset.load_config($root, @config)
       end
     
-      it "should generate correct filenames" do
-        @files.each do |file|
-          File.exists?("#{@dest}/#{@version}_#{file}").should == true
-        end
-        Dir["#{@dest}/*"].length.should == 6
+      it "should populate @root" do
+        SmartAsset.root.should == $root
       end
-      
-      it "should generate correct file sizes" do
-        @files.each do |file|
-          File.new("#{@dest}/#{@version}_#{file}").size.should > 0
-        end
-        total = 0
-        @files[2..3].each do |file|
-          total += File.new("#{@dest}/#{@version}_#{file}").size
-        end
-        total.should == File.new("#{@dest}/#{@version}_#{@files[1]}").size
-        total = 0
-        @files[4..5].each do |file|
-          total += File.new("#{@dest}/#{@version}_#{file}").size
-        end
-        total.should == File.new("#{@dest}/#{@version}_#{@files[0]}").size
+    
+      it "should populate @config" do
+        SmartAsset.config.should == {"public"=>"spec/fixtures/assets",
+         "destination"=>"compressed",
+         "sources"=>{"javascripts"=>"javascripts", "stylesheets"=>"stylesheets"},
+         "javascripts"=>
+          {"package"=>["jquery/jquery", "underscore", "does_not_exist"],
+           "empty_package"=>nil,
+           "non_existent_package"=>["does_not_exist"]},
+         "stylesheets"=>
+          {"package"=>["blueprint/blueprint", 960, "does_not_exist"],
+           "empty_package"=>nil,
+           "non_existent_package"=>["does_not_exist"]}}
       end
-      
-      it "should run all files through the compressor" do
-        @files[2..5].each do |file|
-          @output.string.include?(file.split('_')[-1]).should == true
-        end
+    
+      it "should populate @pub" do
+        SmartAsset.pub.should == "#{$root}/spec/fixtures/assets"
+      end
+    
+      it "should populate @dest" do
+        SmartAsset.dest.should == "#{$root}/spec/fixtures/assets/compressed"
+      end
+    
+      it "should populate @sources" do
+        SmartAsset.sources.should == {"javascripts"=>"javascripts", "stylesheets"=>"stylesheets"}
       end
     end
+  
+    describe :binary do
     
-    describe 'one version out of date' do
-      
       before(:all) do
-        FileUtils.mv "#{@dest}/#{@version}_#{@files[2]}", "#{@dest}/#{@old_version}_#{@files[2]}"
-        @output = capture_stdout do
-          SmartAsset.binary $root, @config
-        end
+        @dest = "#{$root}/spec/fixtures/assets/compressed"
+        @old_version = '20101128112832'
+        @files = %w(
+          package.css
+          package.js
+          jquery_jquery.js
+          underscore.js
+          960.css
+          blueprint_blueprint.css
+        )
+        @versions = %w(
+          20101130061253
+          20101130061253
+          20101130061253
+          20101128112833
+          20101128112833
+          20101130061253
+        )
       end
     
-      it "should generate correct filenames" do
-        @files.each do |file|
-          File.exists?("#{@dest}/#{@version}_#{file}").should == true
+      describe 'no compressed assets' do
+      
+        before(:all) do
+          FileUtils.rm_rf(@dest) unless ENV['FAST']
+          @output = capture_stdout do
+            SmartAsset.binary $root, @config
+          end
         end
-        Dir["#{@dest}/*"].length.should == 6
+    
+        it "should generate correct filenames" do
+          @files.each_with_index do |file, i|
+            File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
+          end
+          Dir["#{@dest}/*"].length.should == 6
+        end
+      
+        it "should generate correct file sizes" do
+          @files.each_with_index do |file, i|
+            File.new("#{@dest}/#{@versions[i]}_#{file}").size.should > 0
+          end
+          total = 0
+          (2..3).each do |i|
+            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+          end
+          total.should == File.new("#{@dest}/#{@versions[1]}_#{@files[1]}").size
+          total = 0
+          (4..5).each do |i|
+            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+          end
+          total.should == File.new("#{@dest}/#{@versions[0]}_#{@files[0]}").size
+        end
+        
+        unless ENV['FAST']
+          it "should run all files through the compressor" do
+            @files[2..5].each do |file|
+              @output.string.include?(file.split('_')[-1]).should == true
+            end
+          end
+        end
+      end
+  
+      describe 'one version out of date' do
+    
+        before(:all) do
+          unless ENV['FAST']
+            FileUtils.mv "#{@dest}/#{@versions[1]}_#{@files[1]}", "#{@dest}/#{@old_version}_#{@files[1]}"
+            FileUtils.mv "#{@dest}/#{@versions[1]}_#{@files[2]}", "#{@dest}/#{@old_version}_#{@files[2]}"
+          end
+          @output = capture_stdout do
+            SmartAsset.binary $root, @config
+          end
+        end
+  
+        it "should generate correct filenames" do
+          @files.each_with_index do |file, i|
+            File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
+          end
+          Dir["#{@dest}/*"].length.should == 6
+        end
+    
+        it "should generate correct file sizes" do
+          @files.each_with_index do |file, i|
+            File.new("#{@dest}/#{@versions[i]}_#{file}").size.should > 0
+          end
+          total = 0
+          (2..3).each_with_index do |i|
+            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+          end
+          total.should == File.new("#{@dest}/#{@versions[1]}_#{@files[1]}").size
+          total = 0
+          (4..5).each do |i|
+            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+          end
+          total.should == File.new("#{@dest}/#{@versions[0]}_#{@files[0]}").size
+        end
+        
+        unless ENV['FAST']
+          it "should run updated file through the compressor" do
+            @files[2..5].each_with_index do |file, i|
+              @output.string.include?(file.split('_')[-1]).should == (i == 0 ? true : false)
+            end
+          end
+        end
+      end
+    end
+  
+    describe :path do
+    
+      describe "development" do
+        
+        before(:all) do
+          SmartAsset.env = 'development'
+        end
+        
+        it "should return development paths" do
+          SmartAsset.paths('javascripts', :package).should == [
+            "/javascripts/jquery/jquery.js",
+            "/javascripts/underscore.js"
+          ]
+          SmartAsset.paths('javascripts', 'jquery/jquery').should == [
+            "/javascripts/jquery/jquery.js"
+          ]
+          SmartAsset.paths('stylesheets', :package).should == [
+            "/stylesheets/blueprint/blueprint.css",
+            "/stylesheets/960.css"
+          ]
+          SmartAsset.paths('stylesheets', 960).should == [
+            "/stylesheets/960.css"
+          ]
+        end
+        
+        it "should leave @cache empty" do
+          SmartAsset.cache.should == {"javascripts"=>{}, "stylesheets"=>{}}
+        end
       end
       
-      it "should generate correct file sizes" do
-        @files.each do |file|
-          File.new("#{@dest}/#{@version}_#{file}").size.should > 0
+      describe "production" do
+        
+        before(:all) do
+          SmartAsset.env = 'production'
         end
-        total = 0
-        @files[2..3].each do |file|
-          total += File.new("#{@dest}/#{@version}_#{file}").size
+        
+        it "should return compressed paths" do
+          SmartAsset.paths('javascripts', :package).should == [
+            "/compressed/20101130061253_package.js"
+          ]
+          SmartAsset.paths('javascripts', 'jquery/jquery').should == [
+            "/compressed/20101130061253_jquery_jquery.js"
+          ]
+          SmartAsset.paths('stylesheets', :package).should == [
+            "/compressed/20101130061253_package.css"
+          ]
+          SmartAsset.paths('stylesheets', 960).should == [
+            "/compressed/20101128112833_960.css"
+          ]
         end
-        total.should == File.new("#{@dest}/#{@version}_#{@files[1]}").size
-        total = 0
-        @files[4..5].each do |file|
-          total += File.new("#{@dest}/#{@version}_#{file}").size
-        end
-        total.should == File.new("#{@dest}/#{@version}_#{@files[0]}").size
-      end
       
-      it "should run updated file through the compressor" do
-        @files[2..5].each_with_index do |file, i|
-          @output.string.include?(file.split('_')[-1]).should == (i == 0 ? true : false)
+        it "should populate @cache" do
+          SmartAsset.cache.should == {"javascripts"=>
+            {"package"=>["/compressed/20101130061253_package.js"],
+             "jquery_jquery"=>["/compressed/20101130061253_jquery_jquery.js"]},
+           "stylesheets"=>
+            {"package"=>["/compressed/20101130061253_package.css"],
+             "960"=>["/compressed/20101128112833_960.css"]}}
         end
       end
     end

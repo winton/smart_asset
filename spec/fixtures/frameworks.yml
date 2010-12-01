@@ -4,16 +4,32 @@ rails:
       - app/controllers/application_controller.rb
       - config/environment.rb
       - config/routes.rb
+    rails:
+      - vendor/plugins/plugin/rails/init.rb
+    all_frameworks:
+      - app/views/application/test.html.erb
+      - config/assets.yml
   <4:
     rails3:
       - app/controllers/application_controller.rb
       - config/application.rb
       - config/routes.rb
       - Gemfile
+    rails:
+      - vendor/plugins/plugin/rails/init.rb
+    all_frameworks:
+      - app/views/application/test.html.erb
+      - config/assets.yml
 sinatra:
   <1:
     sinatra:
       - application.rb
+    all_frameworks:
+      - test.html.erb
+      - config/assets.yml
   <2:
     sinatra:
       - application.rb
+    all_frameworks:
+      - test.html.erb
+      - config/assets.yml

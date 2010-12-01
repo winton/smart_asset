@@ -2,6 +2,8 @@
 *.gem
 coverage
 pkg
+spec/fixtures/assets/compressed
+spec/fixtures/assets/compressed/*
 spec/fixtures/builds
 spec/fixtures/builds/*
 tmp
