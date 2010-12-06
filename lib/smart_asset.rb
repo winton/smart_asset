@@ -50,10 +50,12 @@ class SmartAsset
                 end
                 puts "\nCompressing #{source}..."
                 if ext == 'js'
-                  `java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination} --warning_level QUIET`
+                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination} --warning_level QUIET"
                 elsif ext == 'css'
-                  `java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}`
+                  cmd = "java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}"
                 end
+                puts cmd
+                `cmd`
               end
               compressed[destination] = modified
             end
