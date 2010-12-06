@@ -14,7 +14,7 @@ require 'version'
 class SmartAsset
   class <<self
     
-    attr_accessor :cache, :config, :dest, :env, :pub, :root, :sources
+    attr_accessor :asset_host, :cache, :config, :dest, :env, :pub, :root, :sources
     
     BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
     CLOSURE_COMPILER = BIN + '/closure_compiler.jar'
@@ -37,8 +37,11 @@ class SmartAsset
           files.each do |file|
             if File.exists?(source = "#{dir}/#{file}.#{ext}")
               modified = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
-              next if modified.empty?
-              modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
+              if modified.strip.empty?
+                modified = Time.now.utc.strftime("%Y%m%d%H%M%S")
+              else
+                modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
+              end
               file = file.to_s.gsub('/', '_')
               unless File.exists?(destination = "#{@dest}/#{modified}_#{file}.#{ext}")
                 create_package = true
@@ -77,31 +80,42 @@ class SmartAsset
       @root = File.expand_path(root)
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
+      @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
       @config['public'] ||= 'public'
       @config['destination'] ||= 'packaged'
       @config['sources'] ||= {}
       @config['sources']['javascripts'] ||= "javascripts"
       @config['sources']['stylesheets'] ||= "stylesheets"
       
+      @asset_host = @config['asset_host']
+      @sources = @config['sources']
+      
       @pub = File.expand_path("#{@root}/#{@config['public']}")
       @dest = "#{@pub}/#{@config['destination']}"
-      @sources = @config['sources']
     end
     
     def paths(type, match)
-      ext = ext_from_type type
       match = match.to_s
       
       @cache ||= {}
       @cache[type] ||= {}
       
       if @cache[type][match]
-        @cache[type][match]
-      elsif @env.intern == :production
+        return @cache[type][match]
+      end
+      
+      host =
+        @asset_host.respond_to?(:keys) ?
+          @asset_host[@env.to_s] :
+          @asset_host
+      
+      ext = ext_from_type type
+      
+      if @env.intern == :production
         match = match.gsub('/', '_')
         @cache[type][match] =
           if result = Dir["#{@dest}/*_#{match}.#{ext}"].sort.last
-            [ result.gsub(@pub, '') ]
+            [ "#{host}#{result.gsub(@pub, '')}" ]
           else
             []
           end
@@ -110,13 +124,13 @@ class SmartAsset
           if package.to_s == match
             files.collect do |file|
               file = "/#{@sources[type]}/#{file}.#{ext}"
-              file if File.exists?("#{@pub}/#{file}")
+              "#{host}#{file}" if File.exists?("#{@pub}/#{file}")
             end
           elsif files
             files.collect do |file|
               if file.to_s == match
                 file = "/#{@sources[type]}/#{file}.#{ext}"
-                file if File.exists?("#{@pub}/#{file}")
+                "#{host}#{file}" if File.exists?("#{@pub}/#{file}")
               end
             end
           end

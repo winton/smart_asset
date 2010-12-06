@@ -18,7 +18,9 @@ unless FrameworkFixture.framework
       end
     
       it "should populate @config" do
-        SmartAsset.config.should == {"public"=>"spec/fixtures/assets",
+        SmartAsset.config.should == {
+         "asset_host"=>{"production"=>"http://asset-host.com"},
+         "public"=>"spec/fixtures/assets",
          "destination"=>"compressed",
          "sources"=>{"javascripts"=>"javascripts", "stylesheets"=>"stylesheets"},
          "javascripts"=>
@@ -85,18 +87,18 @@ unless FrameworkFixture.framework
       
         it "should generate correct file sizes" do
           @files.each_with_index do |file, i|
-            File.new("#{@dest}/#{@versions[i]}_#{file}").size.should > 0
+            File.size("#{@dest}/#{@versions[i]}_#{file}").should > 0
           end
           total = 0
           (2..3).each do |i|
-            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
           end
-          total.should == File.new("#{@dest}/#{@versions[1]}_#{@files[1]}").size
+          total.should == File.size("#{@dest}/#{@versions[1]}_#{@files[1]}")
           total = 0
           (4..5).each do |i|
-            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
           end
-          total.should == File.new("#{@dest}/#{@versions[0]}_#{@files[0]}").size
+          total.should == File.size("#{@dest}/#{@versions[0]}_#{@files[0]}")
         end
         
         unless ENV['FAST']
@@ -129,18 +131,18 @@ unless FrameworkFixture.framework
     
         it "should generate correct file sizes" do
           @files.each_with_index do |file, i|
-            File.new("#{@dest}/#{@versions[i]}_#{file}").size.should > 0
+            File.size("#{@dest}/#{@versions[i]}_#{file}").should > 0
           end
           total = 0
-          (2..3).each_with_index do |i|
-            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+          (2..3).each_with_index do |i, x|
+            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
           end
-          total.should == File.new("#{@dest}/#{@versions[1]}_#{@files[1]}").size
+          total.should == File.size("#{@dest}/#{@versions[1]}_#{@files[1]}")
           total = 0
           (4..5).each do |i|
-            total += File.new("#{@dest}/#{@versions[i]}_#{@files[i]}").size
+            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
           end
-          total.should == File.new("#{@dest}/#{@versions[0]}_#{@files[0]}").size
+          total.should == File.size("#{@dest}/#{@versions[0]}_#{@files[0]}")
         end
         
         unless ENV['FAST']
@@ -191,26 +193,26 @@ unless FrameworkFixture.framework
         
         it "should return compressed paths" do
           SmartAsset.paths('javascripts', :package).should == [
-            "/compressed/20101130061253_package.js"
+            "http://asset-host.com/compressed/20101130061253_package.js"
           ]
           SmartAsset.paths('javascripts', 'jquery/jquery').should == [
-            "/compressed/20101130061253_jquery_jquery.js"
+            "http://asset-host.com/compressed/20101130061253_jquery_jquery.js"
           ]
           SmartAsset.paths('stylesheets', :package).should == [
-            "/compressed/20101130061253_package.css"
+            "http://asset-host.com/compressed/20101130061253_package.css"
           ]
           SmartAsset.paths('stylesheets', 960).should == [
-            "/compressed/20101128112833_960.css"
+            "http://asset-host.com/compressed/20101128112833_960.css"
           ]
         end
       
         it "should populate @cache" do
           SmartAsset.cache.should == {"javascripts"=>
-            {"package"=>["/compressed/20101130061253_package.js"],
-             "jquery_jquery"=>["/compressed/20101130061253_jquery_jquery.js"]},
+            {"package"=>["http://asset-host.com/compressed/20101130061253_package.js"],
+             "jquery_jquery"=>["http://asset-host.com/compressed/20101130061253_jquery_jquery.js"]},
            "stylesheets"=>
-            {"package"=>["/compressed/20101130061253_package.css"],
-             "960"=>["/compressed/20101128112833_960.css"]}}
+            {"package"=>["http://asset-host.com/compressed/20101130061253_package.css"],
+             "960"=>["http://asset-host.com/compressed/20101128112833_960.css"]}}
         end
       end
     end

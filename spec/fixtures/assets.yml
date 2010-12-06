@@ -1,3 +1,5 @@
+asset_host:
+  production: http://asset-host.com
 public: spec/fixtures/assets
 destination: compressed
 sources:
