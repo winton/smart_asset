@@ -6,10 +6,10 @@ require 'fileutils'
 require 'time'
 require 'yaml'
 
-$:.unshift File.dirname(__FILE__) + '/smart_asset'
+$:.unshift File.dirname(__FILE__)
 
-require 'helper'
-require 'version'
+require 'smart_asset/helper'
+require 'smart_asset/version'
 
 class SmartAsset
   class <<self
