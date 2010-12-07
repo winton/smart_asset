@@ -54,10 +54,10 @@ unless FrameworkFixture.framework
         @files = %w(
           package.css
           package.js
-          jquery_jquery.js
-          underscore.js
-          960.css
-          blueprint_blueprint.css
+          package_jquery_jquery.js
+          package_underscore.js
+          package_960.css
+          package_blueprint_blueprint.css
         )
         @versions = %w(
           20101130061253
@@ -196,23 +196,23 @@ unless FrameworkFixture.framework
             "http://asset-host.com/compressed/20101130061253_package.js"
           ]
           SmartAsset.paths('javascripts', 'jquery/jquery').should == [
-            "http://asset-host.com/compressed/20101130061253_jquery_jquery.js"
+            "http://asset-host.com/compressed/20101130061253_package_jquery_jquery.js"
           ]
           SmartAsset.paths('stylesheets', :package).should == [
             "http://asset-host.com/compressed/20101130061253_package.css"
           ]
           SmartAsset.paths('stylesheets', 960).should == [
-            "http://asset-host.com/compressed/20101128112833_960.css"
+            "http://asset-host.com/compressed/20101128112833_package_960.css"
           ]
         end
       
         it "should populate @cache" do
           SmartAsset.cache.should == {"javascripts"=>
             {"package"=>["http://asset-host.com/compressed/20101130061253_package.js"],
-             "jquery_jquery"=>["http://asset-host.com/compressed/20101130061253_jquery_jquery.js"]},
+             "jquery_jquery"=>["http://asset-host.com/compressed/20101130061253_package_jquery_jquery.js"]},
            "stylesheets"=>
             {"package"=>["http://asset-host.com/compressed/20101130061253_package.css"],
-             "960"=>["http://asset-host.com/compressed/20101128112833_960.css"]}}
+             "960"=>["http://asset-host.com/compressed/20101128112833_package_960.css"]}}
         end
       end
     end

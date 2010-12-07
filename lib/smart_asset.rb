@@ -43,9 +43,9 @@ class SmartAsset
                 modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
               end
               file = file.to_s.gsub('/', '_')
-              unless File.exists?(destination = "#{@dest}/#{modified}_#{file}.#{ext}")
+              unless File.exists?(destination = "#{@dest}/#{modified}_#{package}_#{file}.#{ext}")
                 create_package = true
-                Dir["#{@dest}/*_#{file}.#{ext}"].each do |old|
+                Dir["#{@dest}/*[0-9]_#{package}_#{file}.#{ext}"].each do |old|
                   FileUtils.rm old
                 end
                 puts "\nCompressing #{source}..."
@@ -55,13 +55,13 @@ class SmartAsset
                   cmd = "java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}"
                 end
                 puts cmd
-                `cmd`
+                `#{cmd}`
               end
               compressed[destination] = modified
             end
           end
           if modified = compressed.values.compact.sort.last
-            old_packages = "#{@dest}/*_#{package}.#{ext}"
+            old_packages = "#{@dest}/*[0-9]_#{package}.#{ext}"
             package = "#{@dest}/#{modified}_#{package}.#{ext}"
             if create_package || !File.exists?(package)
               Dir[old_packages].each do |old|
@@ -83,6 +83,7 @@ class SmartAsset
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
       @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
+      @config['environments'] ||= %w(production)
       @config['public'] ||= 'public'
       @config['destination'] ||= 'packaged'
       @config['sources'] ||= {}
@@ -90,6 +91,7 @@ class SmartAsset
       @config['sources']['stylesheets'] ||= "stylesheets"
       
       @asset_host = @config['asset_host']
+      @envs = @config['environments']
       @sources = @config['sources']
       
       @pub = File.expand_path("#{@root}/#{@config['public']}")
@@ -113,7 +115,7 @@ class SmartAsset
       
       ext = ext_from_type type
       
-      if @env.intern == :production
+      if @envs.include?(@env.to_s)
         match = match.gsub('/', '_')
         @cache[type][match] =
           if result = Dir["#{@dest}/*_#{match}.#{ext}"].sort.last
