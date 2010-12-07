@@ -6,12 +6,13 @@ sources:
   javascripts: javascripts
   stylesheets: stylesheets
 javascripts:
-  package:
+  # Test asset_packager style syntax
+  - package:
     - jquery/jquery
     - underscore
     - does_not_exist
-  empty_package:
-  non_existent_package:
+  - empty_package:
+  - non_existent_package:
     - does_not_exist
 stylesheets:
   package:

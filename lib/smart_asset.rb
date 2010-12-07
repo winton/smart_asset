@@ -90,6 +90,15 @@ class SmartAsset
       @config['sources']['javascripts'] ||= "javascripts"
       @config['sources']['stylesheets'] ||= "stylesheets"
       
+      # Convert from asset packager syntax
+      %w(javascripts stylesheets).each do |type|
+        if @config[type].respond_to?(:pop)
+          @config[type] = @config[type].inject({}) do |package, hash|
+            hash.merge! package
+          end
+        end
+      end
+      
       @asset_host = @config['asset_host']
       @envs = @config['environments']
       @sources = @config['sources']

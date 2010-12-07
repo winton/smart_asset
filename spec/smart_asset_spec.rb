@@ -20,8 +20,9 @@ unless FrameworkFixture.framework
       it "should populate @config" do
         SmartAsset.config.should == {
          "asset_host"=>{"production"=>"http://asset-host.com"},
-         "public"=>"spec/fixtures/assets",
          "destination"=>"compressed",
+         "environments"=>["production"],
+         "public"=>"spec/fixtures/assets",
          "sources"=>{"javascripts"=>"javascripts", "stylesheets"=>"stylesheets"},
          "javascripts"=>
           {"package"=>["jquery/jquery", "underscore", "does_not_exist"],
