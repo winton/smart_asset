@@ -20,7 +20,7 @@ unless FrameworkFixture.framework
       it "should populate @config" do
         SmartAsset.config.should == {
          "asset_host"=>{"production"=>"http://asset-host.com"},
-         "destination"=>"compressed",
+         "destination"=>{"javascripts"=>"compressed", "stylesheets"=>"compressed"},
          "environments"=>["production"],
          "public"=>"spec/fixtures/assets",
          "sources"=>{"javascripts"=>"javascripts", "stylesheets"=>"stylesheets"},
@@ -33,13 +33,28 @@ unless FrameworkFixture.framework
            "empty_package"=>nil,
            "non_existent_package"=>["does_not_exist"]}}
       end
-    
-      it "should populate @pub" do
-        SmartAsset.pub.should == "#{$root}/spec/fixtures/assets"
+      
+      it "should populate @asset_host" do
+        SmartAsset.asset_host.should == {"production"=>"http://asset-host.com"}
       end
     
       it "should populate @dest" do
-        SmartAsset.dest.should == "#{$root}/spec/fixtures/assets/compressed"
+        SmartAsset.dest.should == {
+          'javascripts' => "#{$root}/spec/fixtures/assets/compressed",
+          'stylesheets' => "#{$root}/spec/fixtures/assets/compressed"
+        }
+      end
+      
+      it "should populate @envs" do
+        SmartAsset.envs.should == ["production"]
+      end
+      
+      it "should populate @pub" do
+        SmartAsset.pub.should == "#{$root}/spec/fixtures/assets"
+      end
+      
+      it "should populate @root" do
+        SmartAsset.root.should == $root
       end
     
       it "should populate @sources" do

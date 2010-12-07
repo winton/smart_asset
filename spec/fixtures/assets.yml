@@ -1,7 +1,9 @@
 asset_host:
   production: http://asset-host.com
 public: spec/fixtures/assets
-destination: compressed
+destination:
+  javascripts: compressed
+  stylesheets: compressed
 sources:
   javascripts: javascripts
   stylesheets: stylesheets

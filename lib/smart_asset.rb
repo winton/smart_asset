@@ -14,7 +14,7 @@ require 'smart_asset/version'
 class SmartAsset
   class <<self
     
-    attr_accessor :asset_host, :cache, :config, :dest, :env, :pub, :root, :sources
+    attr_accessor :asset_host, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
     CLOSURE_COMPILER = BIN + '/closure_compiler.jar'
@@ -27,9 +27,10 @@ class SmartAsset
     end
     
     def compress(type)
+      dest = @dest[type]
       dir = "#{@pub}/#{@sources[type]}"
       ext = ext_from_type type
-      FileUtils.mkdir_p @dest
+      FileUtils.mkdir_p dest
       (@config[type] || {}).each do |package, files|
         create_package = false
         compressed = {}
@@ -43,26 +44,27 @@ class SmartAsset
                 modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
               end
               file = file.to_s.gsub('/', '_')
-              unless File.exists?(destination = "#{@dest}/#{modified}_#{package}_#{file}.#{ext}")
+              unless File.exists?(destination = "#{dest}/#{modified}_#{package}_#{file}.#{ext}")
                 create_package = true
-                Dir["#{@dest}/*[0-9]_#{package}_#{file}.#{ext}"].each do |old|
+                Dir["#{dest}/*[0-9]_#{package}_#{file}.#{ext}"].each do |old|
                   FileUtils.rm old
                 end
                 puts "\nCompressing #{source}..."
                 if ext == 'js'
-                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination} --warning_level QUIET"
+                  warning = ENV['WARN'] ? nil : " --warning_level QUIET"
+                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination}#{warn}"
                 elsif ext == 'css'
                   cmd = "java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}"
                 end
-                puts cmd
+                puts cmd if ENV['DEBUG']
                 `#{cmd}`
               end
               compressed[destination] = modified
             end
           end
           if modified = compressed.values.compact.sort.last
-            old_packages = "#{@dest}/*[0-9]_#{package}.#{ext}"
-            package = "#{@dest}/#{modified}_#{package}.#{ext}"
+            old_packages = "#{dest}/*[0-9]_#{package}.#{ext}"
+            package = "#{dest}/#{modified}_#{package}.#{ext}"
             if create_package || !File.exists?(package)
               Dir[old_packages].each do |old|
                 FileUtils.rm old
@@ -85,7 +87,9 @@ class SmartAsset
       @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
       @config['environments'] ||= %w(production)
       @config['public'] ||= 'public'
-      @config['destination'] ||= 'packaged'
+      @config['destination'] ||= {}
+      @config['destination']['javascripts'] ||= 'javascripts/packaged'
+      @config['destination']['stylesheets'] ||= 'stylesheets/packaged'
       @config['sources'] ||= {}
       @config['sources']['javascripts'] ||= "javascripts"
       @config['sources']['stylesheets'] ||= "stylesheets"
@@ -93,7 +97,7 @@ class SmartAsset
       # Convert from asset packager syntax
       %w(javascripts stylesheets).each do |type|
         if @config[type].respond_to?(:pop)
-          @config[type] = @config[type].inject({}) do |package, hash|
+          @config[type] = @config[type].inject({}) do |hash, package|
             hash.merge! package
           end
         end
@@ -104,7 +108,10 @@ class SmartAsset
       @sources = @config['sources']
       
       @pub = File.expand_path("#{@root}/#{@config['public']}")
-      @dest = "#{@pub}/#{@config['destination']}"
+      @dest = %w(javascripts stylesheets).inject({}) do |hash, type|
+        hash[type] = "#{@pub}/#{@config['destination'][type]}"
+        hash
+      end
     end
     
     def paths(type, match)
@@ -122,12 +129,13 @@ class SmartAsset
           @asset_host[@env.to_s] :
           @asset_host
       
+      dest = @dest[type]
       ext = ext_from_type type
       
       if @envs.include?(@env.to_s)
         match = match.gsub('/', '_')
         @cache[type][match] =
-          if result = Dir["#{@dest}/*_#{match}.#{ext}"].sort.last
+          if result = Dir["#{dest}/*_#{match}.#{ext}"].sort.last
             [ "#{host}#{result.gsub(@pub, '')}" ]
           else
             []
