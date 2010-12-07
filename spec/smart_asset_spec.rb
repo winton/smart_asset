@@ -2,6 +2,8 @@ require 'spec_helper'
 
 unless FrameworkFixture.framework
   describe SmartAsset do
+    
+    include SmartAsset::Helper
   
     before(:all) do
       @config = "spec/fixtures/assets.yml"
@@ -19,7 +21,8 @@ unless FrameworkFixture.framework
     
       it "should populate @config" do
         SmartAsset.config.should == {
-         "asset_host"=>{"production"=>"http://asset-host.com"},
+         "asset_host_count"=>2,
+         "asset_host"=>{"production"=>"http://assets%d.host.com"},
          "destination"=>{"javascripts"=>"compressed", "stylesheets"=>"compressed"},
          "environments"=>["production"],
          "public"=>"spec/fixtures/assets",
@@ -35,7 +38,7 @@ unless FrameworkFixture.framework
       end
       
       it "should populate @asset_host" do
-        SmartAsset.asset_host.should == {"production"=>"http://asset-host.com"}
+        SmartAsset.asset_host.should == {"production"=>"http://assets%d.host.com"}
       end
     
       it "should populate @dest" do
@@ -209,26 +212,88 @@ unless FrameworkFixture.framework
         
         it "should return compressed paths" do
           SmartAsset.paths('javascripts', :package).should == [
-            "http://asset-host.com/compressed/20101130061253_package.js"
+            "/compressed/20101130061253_package.js"
           ]
           SmartAsset.paths('javascripts', 'jquery/jquery').should == [
-            "http://asset-host.com/compressed/20101130061253_package_jquery_jquery.js"
+            "/compressed/20101130061253_package_jquery_jquery.js"
           ]
           SmartAsset.paths('stylesheets', :package).should == [
-            "http://asset-host.com/compressed/20101130061253_package.css"
+            "/compressed/20101130061253_package.css"
           ]
           SmartAsset.paths('stylesheets', 960).should == [
-            "http://asset-host.com/compressed/20101128112833_package_960.css"
+            "/compressed/20101128112833_package_960.css"
           ]
         end
       
         it "should populate @cache" do
           SmartAsset.cache.should == {"javascripts"=>
-            {"package"=>["http://asset-host.com/compressed/20101130061253_package.js"],
-             "jquery_jquery"=>["http://asset-host.com/compressed/20101130061253_package_jquery_jquery.js"]},
+            {"package"=>["/compressed/20101130061253_package.js"],
+             "jquery_jquery"=>["/compressed/20101130061253_package_jquery_jquery.js"]},
            "stylesheets"=>
-            {"package"=>["http://asset-host.com/compressed/20101130061253_package.css"],
-             "960"=>["http://asset-host.com/compressed/20101128112833_package_960.css"]}}
+            {"package"=>["/compressed/20101130061253_package.css"],
+             "960"=>["/compressed/20101128112833_package_960.css"]}}
+        end
+      end
+    end
+    
+    describe :helper do
+      describe "production" do
+        
+        before(:all) do
+          SmartAsset.env = 'production'
+          SmartAsset.asset_counter = nil
+        end
+        
+        before(:each) do
+          SmartAsset.cache = nil
+        end
+        
+        it "should output correct script tags" do
+          javascript_include_merged(:package, 'jquery/jquery', :underscore, :unknown).split("\n").should == [
+            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\" type=\"text/javascript\"></script>",
+            "<script src=\"http://assets1.host.com/compressed/20101130061253_package_jquery_jquery.js\" type=\"text/javascript\"></script>",
+            "<script src=\"http://assets0.host.com/compressed/20101128112833_package_underscore.js\" type=\"text/javascript\"></script>"
+          ]
+        end
+        
+        it "should output correct style tags" do
+          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown).split("\n").should == [
+            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
+            "<link href=\"http://assets0.host.com/compressed/20101128112833_package_960.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
+            "<link href=\"http://assets1.host.com/compressed/20101130061253_package_blueprint_blueprint.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+          ]
+        end
+      end
+      
+      describe "development" do
+        
+        before(:all) do
+          SmartAsset.env = 'development'
+        end
+        
+        before(:each) do
+          SmartAsset.cache = nil
+        end
+        
+        it "should output correct script tags for a package" do
+          javascript_include_merged(:package, :unknown).split("\n").should == [
+            "<script src=\"/javascripts/jquery/jquery.js\" type=\"text/javascript\"></script>",
+            "<script src=\"/javascripts/underscore.js\" type=\"text/javascript\"></script>"
+          ]
+        end
+        
+        it "should output correct script tags for individual files" do
+          javascript_include_merged(:underscore, 'jquery/jquery', :unknown).split("\n").should == [
+            "<script src=\"/javascripts/underscore.js\" type=\"text/javascript\"></script>",
+            "<script src=\"/javascripts/jquery/jquery.js\" type=\"text/javascript\"></script>"
+          ]
+        end
+        
+        it "should output correct style tags" do
+          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown).split("\n").should == [
+            "<link href=\"/stylesheets/blueprint/blueprint.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
+            "<link href=\"/stylesheets/960.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+          ]
         end
       end
     end

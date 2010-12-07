@@ -1,5 +1,6 @@
+asset_host_count: 2
 asset_host:
-  production: http://asset-host.com
+  production: http://assets%d.host.com
 public: spec/fixtures/assets
 destination:
   javascripts: compressed

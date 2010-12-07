@@ -14,7 +14,7 @@ require 'smart_asset/version'
 class SmartAsset
   class <<self
     
-    attr_accessor :asset_host, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
+    attr_accessor :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
     CLOSURE_COMPILER = BIN + '/closure_compiler.jar'
@@ -84,6 +84,7 @@ class SmartAsset
       @root = File.expand_path(root)
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
+      @config['asset_host_count'] ||= 4
       @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
       @config['environments'] ||= %w(production)
       @config['public'] ||= 'public'
@@ -124,11 +125,6 @@ class SmartAsset
         return @cache[type][match]
       end
       
-      host =
-        @asset_host.respond_to?(:keys) ?
-          @asset_host[@env.to_s] :
-          @asset_host
-      
       dest = @dest[type]
       ext = ext_from_type type
       
@@ -136,7 +132,7 @@ class SmartAsset
         match = match.gsub('/', '_')
         @cache[type][match] =
           if result = Dir["#{dest}/*_#{match}.#{ext}"].sort.last
-            [ "#{host}#{result.gsub(@pub, '')}" ]
+            [ result.gsub(@pub, '') ]
           else
             []
           end
@@ -145,18 +141,39 @@ class SmartAsset
           if package.to_s == match
             files.collect do |file|
               file = "/#{@sources[type]}/#{file}.#{ext}"
-              "#{host}#{file}" if File.exists?("#{@pub}/#{file}")
+              file if File.exists?("#{@pub}/#{file}")
             end
           elsif files
             files.collect do |file|
               if file.to_s == match
                 file = "/#{@sources[type]}/#{file}.#{ext}"
-                "#{host}#{file}" if File.exists?("#{@pub}/#{file}")
+                file if File.exists?("#{@pub}/#{file}")
               end
             end
           end
         end
         result.flatten.compact.uniq
+      end
+    end
+    
+    def prepend_asset_host(path)
+      if @asset_host.respond_to?(:keys)
+        host = @asset_host[@env.to_s]
+      else
+        host = @asset_host
+      end
+      
+      if host    
+        if !@asset_counter || @asset_counter == @config['asset_host_count']
+          @asset_counter = 0
+        end
+      
+        count = @asset_counter.to_s
+        @asset_counter += 1
+      
+        host.gsub('%d', count) + path
+      else
+        path
       end
     end
     
