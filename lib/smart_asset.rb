@@ -52,7 +52,7 @@ class SmartAsset
                 puts "\nCompressing #{source}..."
                 if ext == 'js'
                   warning = ENV['WARN'] ? nil : " --warning_level QUIET"
-                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination}#{warn}"
+                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination}#{warning}"
                 elsif ext == 'css'
                   cmd = "java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}"
                 end
