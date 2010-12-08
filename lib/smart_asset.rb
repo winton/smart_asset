@@ -134,9 +134,8 @@ class SmartAsset
       ext = ext_from_type type
       
       if @envs.include?(@env.to_s)
-        match = match.gsub('/', '_')
         @cache[type][match] =
-          if result = Dir["#{dest}/*_#{match}.#{ext}"].sort.last
+          if result = Dir["#{dest}/*[0-9]_#{match}.#{ext}"].sort.last
             [ result.gsub(@pub, '') ]
           else
             []
