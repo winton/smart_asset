@@ -1,9 +1,5 @@
 <script src="/javascripts/jquery/jquery.js" type="text/javascript"></script>
 <script src="/javascripts/underscore.js" type="text/javascript"></script>
 
-<script src="/javascripts/jquery/jquery.js" type="text/javascript"></script>
-
 <link href="/stylesheets/blueprint/blueprint.css" media="screen" rel="Stylesheet" type="text/css" />
-<link href="/stylesheets/960.css" media="screen" rel="Stylesheet" type="text/css" />
-
 <link href="/stylesheets/960.css" media="screen" rel="Stylesheet" type="text/css" />

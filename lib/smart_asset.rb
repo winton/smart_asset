@@ -32,48 +32,53 @@ class SmartAsset
       ext = ext_from_type type
       FileUtils.mkdir_p dest
       (@config[type] || {}).each do |package, files|
-        create_package = false
-        compressed = {}
         if files
+          # Retrieve list of Git modified timestamps
+          modified = []
           files.each do |file|
-            if File.exists?(source = "#{dir}/#{file}.#{ext}")
-              modified = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
-              if modified.strip.empty?
-                modified = Time.now.utc.strftime("%Y%m%d%H%M%S")
+            if File.exists?("#{dir}/#{file}.#{ext}")
+              mod = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
+              if mod.strip.empty?
+                modified << Time.now.utc.strftime("%Y%m%d%H%M%S")
               else
-                modified = Time.parse(modified).utc.strftime("%Y%m%d%H%M%S")
+                modified << Time.parse(mod).utc.strftime("%Y%m%d%H%M%S")
               end
-              file = file.to_s.gsub('/', '_')
-              unless File.exists?(destination = "#{dest}/#{modified}_#{package}_#{file}.#{ext}")
-                create_package = true
-                Dir["#{dest}/*[0-9]_#{package}_#{file}.#{ext}"].each do |old|
-                  FileUtils.rm old
-                end
-                puts "\nCompressing #{source}..."
-                if ext == 'js'
-                  warning = ENV['WARN'] ? nil : " --warning_level QUIET"
-                  cmd = "java -jar #{CLOSURE_COMPILER} --js #{source} --js_output_file #{destination}#{warning}"
-                elsif ext == 'css'
-                  cmd = "java -jar #{YUI_COMPRESSOR} #{source} -o #{destination}"
-                end
-                puts cmd if ENV['DEBUG']
-                `#{cmd}`
-              end
-              compressed[destination] = modified
             end
           end
-          if modified = compressed.values.compact.sort.last
-            old_packages = "#{dest}/*[0-9]_#{package}.#{ext}"
-            package = "#{dest}/#{modified}_#{package}.#{ext}"
-            if create_package || !File.exists?(package)
-              Dir[old_packages].each do |old|
-                FileUtils.rm old
+          modified = modified.sort.last
+          next unless modified
+          
+          unless File.exists?(output = "#{dest}/#{modified}_#{package}.#{ext}")
+            data = []
+            
+            # Join files in package
+            files.each do |file|
+              if File.exists?(source = "#{dir}/#{file}.#{ext}")
+                data << File.read(source)
               end
-              data = compressed.keys.collect do |file|
-                File.read file
-              end
-              File.open(package, 'w') { |f| f.write(data.join) }
             end
+            
+            # Delete old package
+            Dir["#{dest}/*[0-9]_#{package}.#{ext}"].each do |old|
+              FileUtils.rm old
+            end
+            
+            # Don't create new compressed file if no data
+            next if data.empty?
+            
+            # Compress joined files
+            tmp = "#{dest}/tmp.#{ext}"
+            File.open(tmp, 'w') { |f| f.write(data.join) }
+            puts "\nCreating #{output}..."
+            if ext == 'js'
+              warning = ENV['WARN'] ? nil : " --warning_level QUIET"
+              cmd = "java -jar #{CLOSURE_COMPILER} --js #{tmp} --js_output_file #{output}#{warning}"
+            elsif ext == 'css'
+              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{output}"
+            end
+            puts cmd if ENV['DEBUG']
+            `#{cmd}`
+            FileUtils.rm tmp
           end
         end
       end
@@ -142,13 +147,6 @@ class SmartAsset
             files.collect do |file|
               file = "/#{@sources[type]}/#{file}.#{ext}"
               file if File.exists?("#{@pub}/#{file}")
-            end
-          elsif files
-            files.collect do |file|
-              if file.to_s == match
-                file = "/#{@sources[type]}/#{file}.#{ext}"
-                file if File.exists?("#{@pub}/#{file}")
-              end
             end
           end
         end

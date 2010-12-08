@@ -69,21 +69,13 @@ unless FrameworkFixture.framework
     
       before(:all) do
         @dest = "#{$root}/spec/fixtures/assets/compressed"
-        @old_version = '20101128112832'
+        @old_version = '20101130061252'
         @files = %w(
           package.css
           package.js
-          package_jquery_jquery.js
-          package_underscore.js
-          package_960.css
-          package_blueprint_blueprint.css
         )
         @versions = %w(
           20101130061253
-          20101130061253
-          20101130061253
-          20101128112833
-          20101128112833
           20101130061253
         )
       end
@@ -101,29 +93,28 @@ unless FrameworkFixture.framework
           @files.each_with_index do |file, i|
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
-          Dir["#{@dest}/*"].length.should == 6
+          Dir["#{@dest}/*"].length.should == @files.length
         end
       
-        it "should generate correct file sizes" do
+        it "should create package files with content" do
           @files.each_with_index do |file, i|
-            File.size("#{@dest}/#{@versions[i]}_#{file}").should > 0
+            File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
+            if i == 0
+              css = File.read(path)
+              css.include?('.container_12').should == true
+              css.include?('.error').should == true
+            else
+              js = File.read(path)
+              js.include?('jQuery').should == true
+              js.include?('VERSION').should == true
+            end
           end
-          total = 0
-          (2..3).each do |i|
-            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
-          end
-          total.should == File.size("#{@dest}/#{@versions[1]}_#{@files[1]}")
-          total = 0
-          (4..5).each do |i|
-            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
-          end
-          total.should == File.size("#{@dest}/#{@versions[0]}_#{@files[0]}")
         end
         
         unless ENV['FAST']
           it "should run all files through the compressor" do
-            @files[2..5].each do |file|
-              @output.string.include?(file.split('_')[-1]).should == true
+            @files.each do |file|
+              @output.string.include?(file).should == true
             end
           end
         end
@@ -133,8 +124,7 @@ unless FrameworkFixture.framework
     
         before(:all) do
           unless ENV['FAST']
-            FileUtils.mv "#{@dest}/#{@versions[1]}_#{@files[1]}", "#{@dest}/#{@old_version}_#{@files[1]}"
-            FileUtils.mv "#{@dest}/#{@versions[1]}_#{@files[2]}", "#{@dest}/#{@old_version}_#{@files[2]}"
+            FileUtils.mv "#{@dest}/#{@versions[0]}_#{@files[0]}", "#{@dest}/#{@old_version}_#{@files[0]}"
           end
           @output = capture_stdout do
             SmartAsset.binary $root, @config
@@ -145,29 +135,28 @@ unless FrameworkFixture.framework
           @files.each_with_index do |file, i|
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
-          Dir["#{@dest}/*"].length.should == 6
+          Dir["#{@dest}/*"].length.should == @files.length
         end
     
-        it "should generate correct file sizes" do
+        it "should create package files with content" do
           @files.each_with_index do |file, i|
-            File.size("#{@dest}/#{@versions[i]}_#{file}").should > 0
+            File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
+            if i == 0
+              css = File.read(path)
+              css.include?('.container_12').should == true
+              css.include?('.error').should == true
+            else
+              js = File.read(path)
+              js.include?('jQuery').should == true
+              js.include?('VERSION').should == true
+            end
           end
-          total = 0
-          (2..3).each_with_index do |i, x|
-            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
-          end
-          total.should == File.size("#{@dest}/#{@versions[1]}_#{@files[1]}")
-          total = 0
-          (4..5).each do |i|
-            total += File.size("#{@dest}/#{@versions[i]}_#{@files[i]}")
-          end
-          total.should == File.size("#{@dest}/#{@versions[0]}_#{@files[0]}")
         end
         
         unless ENV['FAST']
           it "should run updated file through the compressor" do
-            @files[2..5].each_with_index do |file, i|
-              @output.string.include?(file.split('_')[-1]).should == (i == 0 ? true : false)
+            @files.each_with_index do |file, i|
+              @output.string.include?(file).should == (i == 0 ? true : false)
             end
           end
         end
@@ -187,14 +176,8 @@ unless FrameworkFixture.framework
             "/javascripts/jquery/jquery.js",
             "/javascripts/underscore.js"
           ]
-          SmartAsset.paths('javascripts', 'jquery/jquery').should == [
-            "/javascripts/jquery/jquery.js"
-          ]
           SmartAsset.paths('stylesheets', :package).should == [
             "/stylesheets/blueprint/blueprint.css",
-            "/stylesheets/960.css"
-          ]
-          SmartAsset.paths('stylesheets', 960).should == [
             "/stylesheets/960.css"
           ]
         end
@@ -214,24 +197,16 @@ unless FrameworkFixture.framework
           SmartAsset.paths('javascripts', :package).should == [
             "/compressed/20101130061253_package.js"
           ]
-          SmartAsset.paths('javascripts', 'jquery/jquery').should == [
-            "/compressed/20101130061253_package_jquery_jquery.js"
-          ]
           SmartAsset.paths('stylesheets', :package).should == [
             "/compressed/20101130061253_package.css"
-          ]
-          SmartAsset.paths('stylesheets', 960).should == [
-            "/compressed/20101128112833_package_960.css"
           ]
         end
       
         it "should populate @cache" do
           SmartAsset.cache.should == {"javascripts"=>
-            {"package"=>["/compressed/20101130061253_package.js"],
-             "jquery_jquery"=>["/compressed/20101130061253_package_jquery_jquery.js"]},
+            {"package"=>["/compressed/20101130061253_package.js"]},
            "stylesheets"=>
-            {"package"=>["/compressed/20101130061253_package.css"],
-             "960"=>["/compressed/20101128112833_package_960.css"]}}
+            {"package"=>["/compressed/20101130061253_package.css"]}}
         end
       end
     end
@@ -249,18 +224,14 @@ unless FrameworkFixture.framework
         end
         
         it "should output correct script tags" do
-          javascript_include_merged(:package, 'jquery/jquery', :underscore, :unknown).split("\n").should == [
-            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\" type=\"text/javascript\"></script>",
-            "<script src=\"http://assets1.host.com/compressed/20101130061253_package_jquery_jquery.js\" type=\"text/javascript\"></script>",
-            "<script src=\"http://assets0.host.com/compressed/20101128112833_package_underscore.js\" type=\"text/javascript\"></script>"
+          javascript_include_merged(:package, :unknown).split("\n").should == [
+            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\" type=\"text/javascript\"></script>"
           ]
         end
         
         it "should output correct style tags" do
-          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown).split("\n").should == [
-            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
-            "<link href=\"http://assets0.host.com/compressed/20101128112833_package_960.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
-            "<link href=\"http://assets1.host.com/compressed/20101130061253_package_blueprint_blueprint.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+          stylesheet_link_merged(:package, :unknown).split("\n").should == [
+            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
           ]
         end
       end
@@ -282,15 +253,8 @@ unless FrameworkFixture.framework
           ]
         end
         
-        it "should output correct script tags for individual files" do
-          javascript_include_merged(:underscore, 'jquery/jquery', :unknown).split("\n").should == [
-            "<script src=\"/javascripts/underscore.js\" type=\"text/javascript\"></script>",
-            "<script src=\"/javascripts/jquery/jquery.js\" type=\"text/javascript\"></script>"
-          ]
-        end
-        
         it "should output correct style tags" do
-          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown, :media => 'print').split("\n").should == [
+          stylesheet_link_merged(:package, :unknown, :media => 'print').split("\n").should == [
             "<link href=\"/stylesheets/blueprint/blueprint.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />",
             "<link href=\"/stylesheets/960.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />"
           ]

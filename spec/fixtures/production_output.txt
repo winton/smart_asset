@@ -1,7 +1,3 @@
 <script src="/packaged/20101130061253_package.js" type="text/javascript"></script>
 
-<script src="/packaged/20101130061253_jquery_jquery.js" type="text/javascript"></script>
-
 <link href="/packaged/20101130061253_package.css" media="screen" rel="Stylesheet" type="text/css" />
-
-<link href="/packaged/20101128112833_960.css" media="screen" rel="Stylesheet" type="text/css" />
