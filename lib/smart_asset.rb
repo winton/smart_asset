@@ -32,6 +32,7 @@ class SmartAsset
       ext = ext_from_type type
       FileUtils.mkdir_p dest
       (@config[type] || {}).each do |package, files|
+        next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
         if files
           # Retrieve list of Git modified timestamps
           modified = []
@@ -68,7 +69,7 @@ class SmartAsset
             
             # Compress joined files
             tmp = "#{dest}/tmp.#{ext}"
-            File.open(tmp, 'w') { |f| f.write(data.join) }
+            File.open(tmp, 'w') { |f| f.write(data.join("\n")) }
             puts "\nCreating #{output}..."
             if ext == 'js'
               warning = ENV['WARN'] ? nil : " --warning_level QUIET"
@@ -78,7 +79,7 @@ class SmartAsset
             end
             puts cmd if ENV['DEBUG']
             `#{cmd}`
-            FileUtils.rm tmp
+            FileUtils.rm(tmp) unless ENV['DEBUG']
           end
         end
       end
