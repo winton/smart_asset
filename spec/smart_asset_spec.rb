@@ -290,9 +290,9 @@ unless FrameworkFixture.framework
         end
         
         it "should output correct style tags" do
-          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown).split("\n").should == [
-            "<link href=\"/stylesheets/blueprint/blueprint.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />",
-            "<link href=\"/stylesheets/960.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+          stylesheet_link_merged(:package, 960, 'blueprint/blueprint', :unknown, :media => 'print').split("\n").should == [
+            "<link href=\"/stylesheets/blueprint/blueprint.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />",
+            "<link href=\"/stylesheets/960.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />"
           ]
         end
       end

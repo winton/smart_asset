@@ -9,8 +9,10 @@ class SmartAsset
     end
     
     def stylesheet_link_merged(*stylesheets)
+      options = stylesheets.last.is_a?(::Hash) ? stylesheets.pop : {}
+      options[:media] ||= 'screen'
       output = stylesheet_paths(*stylesheets).collect { |css|
-        "<link href=\"#{SmartAsset.prepend_asset_host css}\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+        "<link href=\"#{SmartAsset.prepend_asset_host css}\" media=\"#{options[:media]}\" rel=\"Stylesheet\" type=\"text/css\" />"
       }.join("\n")
       defined?(Rails) && Rails.version[0..0] == '3' ? output.html_safe : output
     end
