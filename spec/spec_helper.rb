@@ -10,7 +10,10 @@ SmartAsset::Gems.require(:spec)
 
 require 'rack/test'
 
-require "#{$root}/lib/smart_asset"
+unless FrameworkFixture.framework
+  require "#{$root}/lib/smart_asset"
+end
+
 require 'pp'
 require 'stringio'
 
