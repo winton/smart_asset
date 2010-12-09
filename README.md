@@ -3,53 +3,55 @@ SmartAsset
 
 Smart asset packaging for Rails and Sinatra.
 
-Why?
-----
+Features
+--------
 
-We wanted asset packaging similar to <code>AssetPackager</code>, but with the following changes:
+Similar to <code>AssetPackager</code>, but with the following changes:
 
-* Versioning is based off of modified time from Git
-* Javascript compression uses Google Closure Compiler
-* Compatible with any Ruby framework (tested with Rails 2, Rails 3, and Sinatra)
-* More configurable options
+* Git modified date/time for package version
+* Google Closure Compiler for javascript compression
+* Framework agnostic (adapters provided for Rails 2, Rails 3, and Sinatra)
 
-Requirements
+<a name="installation"></a>
+
+Installation
 ------------
+
+### Install Gem
 
 <pre>
 gem install smart_asset
 </pre>
 
-Rails 2
--------
+### Rails 2
 
-### config/environment.rb
+#### config/environment.rb
 
 <pre>
 config.gem 'smart_asset'
 </pre>
 
-Rails 3
--------
+### Rails 3
 
-### Gemfile
+#### Gemfile
 
 <pre>
 gem 'smart_asset'
 </pre>
 
-Sinatra
--------
+### Sinatra
 
+<pre>
 require 'sinatra/base'
 require 'smart_asset'
 
-class Application < Sinatra::Base
+class Application &lt; Sinatra::Base
   include SmartAsset::Adapters::Sinatra
 end
+</pre>
 
-Package Configuration File
---------------------------
+Create Configuration File
+-------------------------
 
 ### config/assets.yml
 
@@ -68,18 +70,18 @@ stylesheets:
     - front_page
 </pre>
 
-By default, SmartAsset will look for your assets in <code>public/javascripts</code> and <code>public/stylesheets</code>.
+By default, SmartAsset will look for assets in <code>public/javascripts</code> and <code>public/stylesheets</code>.
 
 Create Packaged Assets
 ----------------------
 
-In a shell, <code>cd</code> to your project and run
+<code>cd</code> to your project and run
 
 <pre>
 smart_asset
 </pre>
 
-If your project is Git version controlled, only the assets that have changed will be repackaged.
+If your project is Git version controlled, only the assets that have changed are repackaged.
 
 Otherwise, all packages generate every time.
 
@@ -94,22 +96,20 @@ Include Packages in Your Template
 Migrating from AssetPackager
 ----------------------------
 
-* Remove <code>asset\_packager</code> from your project
-* Install <code>smart\_asset</code> into your project using the instructions for your framework (above)
+* <code>rm vendor/plugins/asset\_packager</code>
+* <a href="#installation">Install SmartAsset</a>
 * Move <code>config/asset\_packages.yml</code> to <code>config/assets.yml</code>
-* <code>cd</code> to your project and run the <code>smart_asset</code> command
-
-Profit!
+* Instead of running <code>rake asset:packager:build_all</code>, run <code>smart\_asset</code>
 
 Other Options
 -------------
 
-There are more options to be used within the <code>assets.yml</code> file.
+You may add extra options to your <code>config/assets.yml</code> file.
 
-Default values are listed below when applicable:
+All the values below are the default values, excluding <code>asset\_host</code>:
 
 <pre>
-# Asset host URL (defaults to nil)
+# Asset host URL (defaults to ActionController::Base.asset_host or nil)
 asset_host:
   production: http://assets%d.mydomain.com
 
