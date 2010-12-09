@@ -1,3 +1,4 @@
+append_random: false
 javascripts:
   package:
     - jquery/jquery

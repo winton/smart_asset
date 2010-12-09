@@ -106,9 +106,12 @@ Other Options
 
 You may add extra options to your <code>config/assets.yml</code> file.
 
-All the values below are the default values, excluding <code>asset\_host</code>:
+All the values below are the default values, excluding <code>append\_random</code> and <code>asset\_host</code>:
 
 <pre>
+# Append random numbers to script paths (defaults to true in development mode)
+append_random: false
+
 # Asset host URL (defaults to ActionController::Base.asset_host or nil)
 asset_host:
   production: http://assets%d.mydomain.com

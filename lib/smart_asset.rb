@@ -14,7 +14,7 @@ require 'smart_asset/version'
 class SmartAsset
   class <<self
     
-    attr_accessor :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
+    attr_accessor :append_random, :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
     CLOSURE_COMPILER = BIN + '/closure_compiler.jar'
@@ -90,6 +90,9 @@ class SmartAsset
       @root = File.expand_path(root)
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
+      if @config['append_random'].nil?
+        @config['append_random'] = @env == 'development'
+      end
       @config['asset_host_count'] ||= 4
       @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
       @config['environments'] ||= %w(production)
@@ -110,6 +113,7 @@ class SmartAsset
         end
       end
       
+      @append_random = @config['append_random']
       @asset_host = @config['asset_host']
       @envs = @config['environments']
       @sources = @config['sources']

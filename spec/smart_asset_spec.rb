@@ -21,6 +21,7 @@ unless FrameworkFixture.framework
     
       it "should populate @config" do
         SmartAsset.config.should == {
+         "append_random"=>false,
          "asset_host_count"=>2,
          "asset_host"=>{"production"=>"http://assets%d.host.com"},
          "destination"=>{"javascripts"=>"compressed", "stylesheets"=>"compressed"},
@@ -35,6 +36,10 @@ unless FrameworkFixture.framework
           {"package"=>["blueprint/blueprint", 960, "does_not_exist"],
            "empty_package"=>nil,
            "non_existent_package"=>["does_not_exist"]}}
+      end
+      
+      it "should populate @append_random" do
+        SmartAsset.append_random.should == false
       end
       
       it "should populate @asset_host" do
@@ -169,6 +174,7 @@ unless FrameworkFixture.framework
         
         before(:all) do
           SmartAsset.env = 'development'
+          SmartAsset.load_config($root, @config)
         end
         
         it "should return development paths" do
@@ -217,6 +223,7 @@ unless FrameworkFixture.framework
         before(:all) do
           SmartAsset.env = 'production'
           SmartAsset.asset_counter = nil
+          SmartAsset.load_config($root, @config)
         end
         
         before(:each) do
@@ -225,13 +232,13 @@ unless FrameworkFixture.framework
         
         it "should output correct script tags" do
           javascript_include_merged(:package, :unknown).split("\n").should == [
-            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\" type=\"text/javascript\"></script>"
+            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\"></script>"
           ]
         end
         
         it "should output correct style tags" do
           stylesheet_link_merged(:package, :unknown).split("\n").should == [
-            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"Stylesheet\" type=\"text/css\" />"
+            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"stylesheet\" />"
           ]
         end
       end
@@ -240,6 +247,7 @@ unless FrameworkFixture.framework
         
         before(:all) do
           SmartAsset.env = 'development'
+          SmartAsset.load_config($root, @config)
         end
         
         before(:each) do
@@ -247,17 +255,15 @@ unless FrameworkFixture.framework
         end
         
         it "should output correct script tags for a package" do
-          javascript_include_merged(:package, :unknown).split("\n").should == [
-            "<script src=\"/javascripts/jquery/jquery.js\" type=\"text/javascript\"></script>",
-            "<script src=\"/javascripts/underscore.js\" type=\"text/javascript\"></script>"
-          ]
+          js = javascript_include_merged(:package, :unknown).split("\n")
+          js[0].should =~ /<script src="\/javascripts\/jquery\/jquery\.js\?\d+"><\/script>/
+          js[1].should =~ /<script src="\/javascripts\/underscore\.js\?\d+"><\/script>/
         end
         
         it "should output correct style tags" do
-          stylesheet_link_merged(:package, :unknown, :media => 'print').split("\n").should == [
-            "<link href=\"/stylesheets/blueprint/blueprint.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />",
-            "<link href=\"/stylesheets/960.css\" media=\"print\" rel=\"Stylesheet\" type=\"text/css\" />"
-          ]
+          css = stylesheet_link_merged(:package, :unknown, :media => 'print').split("\n")
+          css[0].should =~ /<link href="\/stylesheets\/blueprint\/blueprint\.css\?\d+" media="print" rel="stylesheet" \/>/
+          css[1].should =~ /<link href="\/stylesheets\/960\.css\?\d+" media="print" rel="stylesheet" \/>/
         end
       end
     end
