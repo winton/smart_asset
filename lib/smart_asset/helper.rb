@@ -3,7 +3,7 @@ class SmartAsset
     
     def javascript_include_merged(*javascripts)
       output = javascript_paths(*javascripts).collect { |js|
-        "<script src=\"#{SmartAsset.prepend_asset_host js}\" type=\"text/javascript\"></script>"
+        "<script src=\"#{SmartAsset.prepend_asset_host js}\"></script>"
       }.join("\n")
       defined?(Rails) && Rails.version[0..0] == '3' ? output.html_safe : output
     end
@@ -12,7 +12,7 @@ class SmartAsset
       options = stylesheets.last.is_a?(::Hash) ? stylesheets.pop : {}
       options[:media] ||= 'screen'
       output = stylesheet_paths(*stylesheets).collect { |css|
-        "<link href=\"#{SmartAsset.prepend_asset_host css}\" media=\"#{options[:media]}\" rel=\"Stylesheet\" type=\"text/css\" />"
+        "<link href=\"#{SmartAsset.prepend_asset_host css}\" media=\"#{options[:media]}\" rel=\"stylesheet\" />"
       }.join("\n")
       defined?(Rails) && Rails.version[0..0] == '3' ? output.html_safe : output
     end
