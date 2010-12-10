@@ -98,7 +98,7 @@ unless FrameworkFixture.framework
           @files.each_with_index do |file, i|
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
-          Dir["#{@dest}/*"].length.should == @files.length
+          Dir["#{@dest}/*.{js,css}"].length.should == @files.length
         end
       
         it "should create package files with content" do
@@ -140,7 +140,7 @@ unless FrameworkFixture.framework
           @files.each_with_index do |file, i|
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
-          Dir["#{@dest}/*"].length.should == @files.length
+          Dir["#{@dest}/*.{js,css}"].length.should == @files.length
         end
     
         it "should create package files with content" do
@@ -163,6 +163,69 @@ unless FrameworkFixture.framework
             @files.each_with_index do |file, i|
               @output.string.include?(file).should == (i == 0 ? true : false)
             end
+          end
+        end
+      end
+      
+      unless ENV['FAST']
+        describe 'package contents changed' do
+        
+          before(:all) do
+            @old_version_path = "#{@dest}/javascripts.yml"
+            @old_version = File.read(@old_version_path)
+            @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
+            @old_package = File.read(@old_package_path)
+          
+            SmartAsset.config['javascripts']['package'].delete 'underscore'
+            @output = capture_stdout do
+              SmartAsset.compress 'javascripts'
+            end
+          end
+        
+          after(:all) do
+            File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
+            File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
+          end
+        
+          it "should rewrite javascript package with only jquery" do
+            @files.each_with_index do |file, i|
+              File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
+              if i == 1
+                js = File.read(path)
+                js.include?('jQuery').should == true
+                js.include?('VERSION').should == false
+              end
+            end
+          end
+        
+          it "should run updated file through the compressor" do
+            @files.each_with_index do |file, i|
+              @output.string.include?(file).should == (i == 1 ? true : false)
+            end
+          end
+        end
+        
+        describe 'package removed' do
+
+          before(:all) do
+            @old_version_path = "#{@dest}/javascripts.yml"
+            @old_version = File.read(@old_version_path)
+            @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
+            @old_package = File.read(@old_package_path)
+
+            SmartAsset.config['javascripts'].delete 'package'
+            @output = capture_stdout do
+              SmartAsset.compress 'javascripts'
+            end
+          end
+
+          after(:all) do
+            File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
+            File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
+          end
+
+          it "should delete the javascript package" do
+            File.exists?("#{@dest}/#{@versions[1]}_#{@files[1]}").should == false
           end
         end
       end

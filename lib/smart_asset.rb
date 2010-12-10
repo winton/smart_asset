@@ -30,7 +30,15 @@ class SmartAsset
       dest = @dest[type]
       dir = "#{@pub}/#{@sources[type]}"
       ext = ext_from_type type
+      version = {}
+      
+      # Read version yaml
+      if File.exists?(version_path = "#{dest}/#{type}.yml")
+        version = YAML::load(File.read(version_path))
+      end
+      
       FileUtils.mkdir_p dest
+      
       (@config[type] || {}).each do |package, files|
         next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
         if files
@@ -49,7 +57,9 @@ class SmartAsset
           modified = modified.sort.last
           next unless modified
           
-          unless File.exists?(output = "#{dest}/#{modified}_#{package}.#{ext}")
+          # If package changed or package file doesn't exist
+          output = "#{dest}/#{modified}_#{package}.#{ext}"
+          if version[package] != files || !File.exists?(output)
             data = []
             
             # Join files in package
@@ -82,6 +92,19 @@ class SmartAsset
             FileUtils.rm(tmp) unless ENV['DEBUG']
           end
         end
+      end
+      
+      # Delete removed packages
+      (version.keys - (@config[type] || {}).keys).each do |package|
+        Dir["#{dest}/*[0-9]_#{package}.#{ext}"].each do |old|
+          FileUtils.rm old
+        end
+      end
+      
+      # Write version yaml file
+      if @config[type]
+        puts version_path
+        File.open(version_path, 'w') { |f| f.write(YAML::dump(@config[type])) }
       end
     end
     
