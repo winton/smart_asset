@@ -103,7 +103,6 @@ class SmartAsset
       
       # Write version yaml file
       if @config[type]
-        puts version_path
         File.open(version_path, 'w') { |f| f.write(YAML::dump(@config[type])) }
       end
     end
