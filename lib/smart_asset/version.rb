@@ -1,3 +1,3 @@
 class SmartAsset
-  VERSION = "0.3.4" unless defined?(::SmartAsset::VERSION)
+  VERSION = "0.4.0" unless defined?(::SmartAsset::VERSION)
 end
