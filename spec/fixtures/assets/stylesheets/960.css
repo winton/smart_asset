@@ -641,3 +641,8 @@ body {
 .clearfix {
 	zoom: 1;
 }
+
+/* YUI Compression Issue Test */
+@media screen and (max-width: 320px) {
+	clear: both;
+}

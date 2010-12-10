@@ -123,6 +123,10 @@ unless FrameworkFixture.framework
             end
           end
         end
+        
+        it "should fix YUI compression issue" do
+          File.read("#{@dest}/#{@versions[0]}_#{@files[0]}").include?("screen and (").should == true
+        end
       end
   
       describe 'one version out of date' do

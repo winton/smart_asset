@@ -90,6 +90,15 @@ class SmartAsset
             puts cmd if ENV['DEBUG']
             `#{cmd}`
             FileUtils.rm(tmp) unless ENV['DEBUG']
+            
+            # Fix YUI compression issue
+            if ext == 'css'
+              if RUBY_PLATFORM.downcase.include?('darwin')
+                `sed -i '' 's/ and(/ and (/g' #{output}`
+              else
+                `sed -i 's/ and(/ and (/g' #{output}`
+              end
+            end
           end
         end
       end
