@@ -7,6 +7,16 @@ unless FrameworkFixture.framework
   
     before(:all) do
       @config = "spec/fixtures/assets.yml"
+      @dest = "#{$root}/spec/fixtures/assets/compressed"
+      @old_version = '20101130061252'
+      @files = %w(
+        package.css
+        package.js
+      )
+      @versions = %w(
+        20101210234715
+        20101130061253
+      )
     end
   
     describe :load_config do
@@ -71,20 +81,6 @@ unless FrameworkFixture.framework
     end
   
     describe :binary do
-    
-      before(:all) do
-        @dest = "#{$root}/spec/fixtures/assets/compressed"
-        @old_version = '20101130061252'
-        @files = %w(
-          package.css
-          package.js
-        )
-        @versions = %w(
-          20101130061253
-          20101130061253
-        )
-      end
-    
       describe 'no compressed assets' do
       
         before(:all) do
@@ -96,6 +92,11 @@ unless FrameworkFixture.framework
     
         it "should generate correct filenames" do
           @files.each_with_index do |file, i|
+            unless File.exists?("#{@dest}/#{@versions[i]}_#{file}")
+              puts "#{@dest}/#{@versions[i]}_#{file}".inspect
+              exit
+            end
+              
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
           Dir["#{@dest}/*.{js,css}"].length.should == @files.length
@@ -172,64 +173,104 @@ unless FrameworkFixture.framework
       end
       
       unless ENV['FAST']
-        describe 'package contents changed' do
-        
+        describe 'package changed' do
+          
           before(:all) do
+            @package_config = SmartAsset.config['javascripts']['package']
             @old_version_path = "#{@dest}/javascripts.yml"
             @old_version = File.read(@old_version_path)
             @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
             @old_package = File.read(@old_package_path)
-          
-            SmartAsset.config['javascripts']['package'].delete 'underscore'
-            @output = capture_stdout do
-              SmartAsset.compress 'javascripts'
-            end
           end
-        
+          
           after(:all) do
             File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
             File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
           end
+          
+          after(:each) do
+            SmartAsset.config['javascripts']['package'] = @package_config
+          end
+          
+          describe 'package child removed' do
         
-          it "should rewrite javascript package with only jquery" do
-            @files.each_with_index do |file, i|
-              File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
-              if i == 1
-                js = File.read(path)
-                js.include?('jQuery').should == true
-                js.include?('VERSION').should == false
+            before(:all) do
+              SmartAsset.config['javascripts']['package'].delete 'underscore'
+              @output = capture_stdout do
+                SmartAsset.compress 'javascripts'
+              end
+            end
+        
+            it "should rewrite javascript package with only jquery" do
+              @files.each_with_index do |file, i|
+                File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
+                if i == 1
+                  js = File.read(path)
+                  js.include?('jQuery').should == true
+                  js.include?('VERSION').should == false
+                end
+              end
+            end
+        
+            it "should run updated file through the compressor" do
+              @files.each_with_index do |file, i|
+                @output.string.include?(file).should == (i == 1 ? true : false)
               end
             end
           end
         
-          it "should run updated file through the compressor" do
-            @files.each_with_index do |file, i|
-              @output.string.include?(file).should == (i == 1 ? true : false)
+          describe 'package removed' do
+
+            before(:all) do
+              @old_version_path = "#{@dest}/javascripts.yml"
+              @old_version = File.read(@old_version_path)
+              @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
+              @old_package = File.read(@old_package_path)
+
+              SmartAsset.config['javascripts'].delete 'package'
+              @output = capture_stdout do
+                SmartAsset.compress 'javascripts'
+              end
+            end
+
+            after(:all) do
+              File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
+              File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
+            end
+
+            it "should delete the javascript package" do
+              File.exists?("#{@dest}/#{@versions[1]}_#{@files[1]}").should == false
             end
           end
-        end
         
-        describe 'package removed' do
-
-          before(:all) do
-            @old_version_path = "#{@dest}/javascripts.yml"
-            @old_version = File.read(@old_version_path)
-            @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
-            @old_package = File.read(@old_package_path)
-
-            SmartAsset.config['javascripts'].delete 'package'
-            @output = capture_stdout do
-              SmartAsset.compress 'javascripts'
+          describe 'untracked file' do
+          
+            before(:all) do
+              @modified = Time.now.utc
+              ENV['MODIFIED'] = @modified.to_s
+              @package = "#{@dest}/#{@modified.strftime("%Y%m%d%H%M%S")}_#{@files[1]}"
+              @untracked = "#{@dest}/untracked.js"
+              
+              File.open(@untracked, 'w') { |f| f.write("var untracked = true;") }
+              SmartAsset.config['javascripts']['package'] << 'untracked'
+              
+              @output = capture_stdout do
+                SmartAsset.compress 'javascripts'
+              end
             end
-          end
-
-          after(:all) do
-            File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
-            File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
-          end
-
-          it "should delete the javascript package" do
-            File.exists?("#{@dest}/#{@versions[1]}_#{@files[1]}").should == false
+            
+            after(:all) do
+              ENV.delete 'MODIFIED'
+              FileUtils.rm @untracked
+            end
+            
+            it "should create package with default modified time" do
+              File.exists?(@untracked).should == true
+            end
+            
+            it "should create package with untracked file" do
+              File.read(@untracked).include?('var untracked').should == true
+            end
           end
         end
       end
@@ -268,18 +309,18 @@ unless FrameworkFixture.framework
         
         it "should return compressed paths" do
           SmartAsset.paths('javascripts', :package).should == [
-            "/compressed/20101130061253_package.js"
+            "/compressed/#{@versions[1]}_#{@files[1]}"
           ]
           SmartAsset.paths('stylesheets', :package).should == [
-            "/compressed/20101130061253_package.css"
+            "/compressed/#{@versions[0]}_#{@files[0]}"
           ]
         end
       
         it "should populate @cache" do
           SmartAsset.cache.should == {"javascripts"=>
-            {"package"=>["/compressed/20101130061253_package.js"]},
+            {"package"=>["/compressed/#{@versions[1]}_#{@files[1]}"]},
            "stylesheets"=>
-            {"package"=>["/compressed/20101130061253_package.css"]}}
+            {"package"=>["/compressed/#{@versions[0]}_#{@files[0]}"]}}
         end
       end
     end
@@ -299,13 +340,13 @@ unless FrameworkFixture.framework
         
         it "should output correct script tags" do
           javascript_include_merged(:package, :unknown).split("\n").should == [
-            "<script src=\"http://assets0.host.com/compressed/20101130061253_package.js\"></script>"
+            "<script src=\"http://assets0.host.com/compressed/#{@versions[1]}_#{@files[1]}\"></script>"
           ]
         end
         
         it "should output correct style tags" do
           stylesheet_link_merged(:package, :unknown).split("\n").should == [
-            "<link href=\"http://assets1.host.com/compressed/20101130061253_package.css\" media=\"screen\" rel=\"stylesheet\" />"
+            "<link href=\"http://assets1.host.com/compressed/#{@versions[0]}_#{@files[0]}\" media=\"screen\" rel=\"stylesheet\" />"
           ]
         end
       end

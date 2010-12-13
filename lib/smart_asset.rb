@@ -48,7 +48,7 @@ class SmartAsset
             if File.exists?("#{dir}/#{file}.#{ext}")
               mod = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
               if mod.strip.empty? || mod.include?('command not found')
-                modified << Time.now.utc.strftime("%Y%m%d%H%M%S")
+                modified << (ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now).utc.strftime("%Y%m%d%H%M%S")
               else
                 modified << Time.parse(mod).utc.strftime("%Y%m%d%H%M%S")
               end
