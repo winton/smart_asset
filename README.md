@@ -104,6 +104,8 @@ Migrating from AssetPackager
 Other Options
 -------------
 
+### config/assets.yml
+
 You may add extra options to your <code>config/assets.yml</code> file.
 
 All the values below are the default values, excluding <code>append\_random</code> and <code>asset\_host</code>:
@@ -132,3 +134,18 @@ sources:
   javascripts: javascripts
   stylesheets: stylesheets
 </pre>
+
+### smart\_asset
+
+You use different environment variables with the <code>smart\_asset</code> command.
+
+Example:
+
+<pre>
+WARN=1 smart_asset
+</pre>
+
+* <code>DEBUG=1</code> - Output commands that are running, leave the tmp file around for inspection
+* <code>PACKAGE=package\_1</code> - Only compress a specific package
+* <code>MODIFIED='12/1/2010 12:00'</code> - Use a default modified time other than Time.now for non-version controlled files
+* <code>WARN=1</code> - Get compression warnings from Closure Compiler and YUI Compressor
