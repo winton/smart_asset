@@ -85,7 +85,8 @@ class SmartAsset
               warning = ENV['WARN'] ? nil : " --warning_level QUIET"
               cmd = "java -jar #{CLOSURE_COMPILER} --js #{tmp} --js_output_file #{output}#{warning}"
             elsif ext == 'css'
-              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{output}"
+              warning = ENV['WARN'] ? " -v" : nil
+              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{output}#{warning}"
             end
             puts cmd if ENV['DEBUG']
             `#{cmd}`
