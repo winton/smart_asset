@@ -22,6 +22,7 @@ unless FrameworkFixture.framework
     describe :load_config do
     
       before(:all) do
+        SmartAsset.env = 'development'
         SmartAsset.load_config($root, @config)
       end
     
@@ -31,7 +32,7 @@ unless FrameworkFixture.framework
     
       it "should populate @config" do
         SmartAsset.config.should == {
-         "append_random"=>false,
+         "append_random"=>{"development"=>true},
          "asset_host_count"=>2,
          "asset_host"=>{"production"=>"http://assets%d.host.com"},
          "destination"=>{"javascripts"=>"compressed", "stylesheets"=>"compressed"},
@@ -49,7 +50,7 @@ unless FrameworkFixture.framework
       end
       
       it "should populate @append_random" do
-        SmartAsset.append_random.should == false
+        SmartAsset.append_random.should == true
       end
       
       it "should populate @asset_host" do

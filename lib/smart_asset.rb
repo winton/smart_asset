@@ -122,16 +122,23 @@ class SmartAsset
       @root = File.expand_path(root)
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
+      # Default values
       if @config['append_random'].nil?
-        @config['append_random'] = @env == 'development'
+        @config['append_random'] = {}
       end
+      if @config['append_random']['development'].nil?
+        @config['append_random']['development'] = true
+      end
+      
       @config['asset_host_count'] ||= 4
       @config['asset_host'] ||= ActionController::Base.asset_host rescue nil
       @config['environments'] ||= %w(production)
       @config['public'] ||= 'public'
+      
       @config['destination'] ||= {}
       @config['destination']['javascripts'] ||= 'javascripts/packaged'
       @config['destination']['stylesheets'] ||= 'stylesheets/packaged'
+      
       @config['sources'] ||= {}
       @config['sources']['javascripts'] ||= "javascripts"
       @config['sources']['stylesheets'] ||= "stylesheets"
@@ -145,7 +152,14 @@ class SmartAsset
         end
       end
       
-      @append_random = @config['append_random']
+      # Class variables
+      @append_random = 
+        if @config['append_random'].is_a?(::Hash)
+          @config['append_random'][@env]
+        else
+          @config['append_random']
+        end
+      
       @asset_host = @config['asset_host']
       @envs = @config['environments']
       @sources = @config['sources']

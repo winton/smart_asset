@@ -108,11 +108,12 @@ Other Options
 
 You may add extra options to your <code>config/assets.yml</code> file.
 
-All the values below are the default values, excluding <code>append\_random</code> and <code>asset\_host</code>:
+Below are the default values, excluding <code>asset\_host</code>:
 
 <pre>
-# Append random numbers to script paths (defaults to true in development mode)
-append_random: false
+# Append random numbers to script paths on each request
+append_random:
+  development: true
 
 # Asset host URL (defaults to ActionController::Base.asset_host or nil)
 asset_host:
@@ -145,7 +146,7 @@ Example:
 WARN=1 smart_asset
 </pre>
 
-* <code>DEBUG=1</code> - Output commands that are running, leave the tmp file around for inspection
-* <code>PACKAGE=package\_1</code> - Only compress a specific package
-* <code>MODIFIED='12/1/2010 12:00'</code> - Use a default modified time other than Time.now for non-version controlled files
-* <code>WARN=1</code> - Get compression warnings from Closure Compiler and YUI Compressor
+* <code>DEBUG=1</code><br/>Output commands that are running, leave the tmp file around for inspection
+* <code>PACKAGE=package\_1</code><br/>Only compress a specific package
+* <code>MODIFIED='12/1/2010 12:00'</code><br/>Use a default modified time other than Time.now for non-version controlled files
+* <code>WARN=1</code><br/>Get compression warnings from Closure Compiler and YUI Compressor
