@@ -8,7 +8,7 @@ Features
 
 Similar to <code>AssetPackager</code>, but with the following changes:
 
-* Git modified date/time for package version
+* Git modified date/time for package version (only re-packages files that have been modified)
 * Google Closure Compiler for javascript compression
 * Framework agnostic (adapters provided for Rails 2, Rails 3, and Sinatra)
 
