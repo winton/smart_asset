@@ -108,7 +108,7 @@ Other Options
 
 You may add extra options to your <code>config/assets.yml</code> file.
 
-Below are the default values, excluding <code>asset\_host</code>:
+Below are the default values (excluding <code>asset\_host</code>):
 
 <pre>
 # Append random numbers to script paths on each request
@@ -119,7 +119,7 @@ append_random:
 asset_host:
   production: http://assets%d.mydomain.com
 
-# How many asset hosts you have (if asset_host defined with %d)
+# How many asset hosts you have (use if asset_host defined with %d)
 asset_host_count: 4
 
 # Public directory
@@ -138,15 +138,18 @@ sources:
 
 ### smart\_asset
 
-You use different environment variables with the <code>smart\_asset</code> command.
+You may use environment variables with the <code>smart\_asset</code> command to alter its behavior.
 
-Example:
+<code>DEBUG=1</code><br/>Output commands that are running, leave the tmp file around for inspection
+
+<code>PACKAGE=package\_1</code><br/>Only compress a specific package
+
+<code>MODIFIED='12/1/2010 12:00'</code><br/>Use a default modified time other than Time.now for non-version controlled files
+
+<code>WARN=1</code><br/>Get compression warnings from Closure Compiler and YUI Compressor
+
+#### Example:
 
 <pre>
 WARN=1 smart_asset
 </pre>
-
-* <code>DEBUG=1</code><br/>Output commands that are running, leave the tmp file around for inspection
-* <code>PACKAGE=package\_1</code><br/>Only compress a specific package
-* <code>MODIFIED='12/1/2010 12:00'</code><br/>Use a default modified time other than Time.now for non-version controlled files
-* <code>WARN=1</code><br/>Get compression warnings from Closure Compiler and YUI Compressor
