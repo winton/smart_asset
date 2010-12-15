@@ -126,7 +126,7 @@ class SmartAsset
       if @config['append_random'].nil?
         @config['append_random'] = {}
       end
-      if @config['append_random']['development'].nil?
+      if @config['append_random'].is_a?(::Hash) && @config['append_random']['development'].nil?
         @config['append_random']['development'] = true
       end
       
