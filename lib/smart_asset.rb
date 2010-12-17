@@ -31,6 +31,7 @@ class SmartAsset
       dir = "#{@pub}/#{@sources[type]}"
       ext = ext_from_type type
       version = {}
+      cache = {}
       
       # Read version yaml
       if File.exists?(version_path = "#{dest}/#{type}.yml")
@@ -45,8 +46,9 @@ class SmartAsset
           # Retrieve list of Git modified timestamps
           modified = []
           files.each do |file|
-            if File.exists?("#{dir}/#{file}.#{ext}")
-              mod = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
+            fname = "#{dir}/#{file}.#{ext}"
+            if File.exists?(fname)
+              mod = (cache[fname] ||= `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`)
               if mod.strip.empty? || mod.include?('command not found')
                 modified << (ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now).utc.strftime("%Y%m%d%H%M%S")
               else
