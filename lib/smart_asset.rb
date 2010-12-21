@@ -66,7 +66,6 @@ class SmartAsset
           
           # Package path
           package = "#{dest}/#{hash}_#{package}.#{ext}"
-          packages << package
           
           # If package file exists
           if File.exists?(package)
