@@ -115,12 +115,12 @@ class SmartAsset
       end
       
       # Remove old/unused packages
-      (Dir["#{dest}/????????_*.#{ext}"] - packages).each do |path|
+      (Dir["#{dest}/#{"[^_]"*8}_*.#{ext}"] - packages).each do |path|
         FileUtils.rm path
       end
       
       # Delete legacy files
-      Dir["#{dest}/*.yml", "#{dest}/??????????????_*.{css,js}"].each do |path|
+      Dir["#{dest}/*.yml", "#{dest}/#{"[0-9]"*14}_*.{css,js}"].each do |path|
         FileUtils.rm path
       end
     end
@@ -194,7 +194,7 @@ class SmartAsset
       
       if @envs.include?(@env.to_s)
         @cache[type][match] =
-          if result = Dir["#{dest}/????????_#{match}.#{ext}"].sort.last
+          if result = Dir["#{dest}/#{"[^_]"*8}_#{match}.#{ext}"].sort.last
             [ result.gsub(@pub, '') ]
           else
             []
