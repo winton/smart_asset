@@ -68,8 +68,10 @@ class SmartAsset
           package = "#{dest}/#{hash}_#{package}.#{ext}"
           packages << package
           
-          # If package file does not exist
-          unless File.exists?(package)
+          # If package file exists
+          if File.exists?(package)
+            packages << package
+          else
             data = []
             
             # Join files in package
@@ -106,6 +108,9 @@ class SmartAsset
                 `sed -i 's/ and(/ and (/g' #{package}`
               end
             end
+            
+            # Package created
+            packages << package
           end
         end
       end
@@ -115,8 +120,8 @@ class SmartAsset
         FileUtils.rm path
       end
       
-      # Delete legacy yml files
-      Dir["#{dest}/*.yml"].each do |path|
+      # Delete legacy files
+      Dir["#{dest}/*.yml", "#{dest}/??????????????_*.{css,js}"].each do |path|
         FileUtils.rm path
       end
     end
