@@ -8,14 +8,13 @@ unless FrameworkFixture.framework
     before(:all) do
       @config = "spec/fixtures/assets.yml"
       @dest = "#{$root}/spec/fixtures/assets/compressed"
-      @old_version = '20101130061252'
       @files = %w(
         package.css
         package.js
       )
       @versions = %w(
-        20101210234715
-        20101130061253
+        4c0f7deb
+        91d1e5c5
       )
     end
   
@@ -93,11 +92,6 @@ unless FrameworkFixture.framework
     
         it "should generate correct filenames" do
           @files.each_with_index do |file, i|
-            unless File.exists?("#{@dest}/#{@versions[i]}_#{file}")
-              puts "#{@dest}/#{@versions[i]}_#{file}".inspect
-              exit
-            end
-              
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
           Dir["#{@dest}/*.{js,css}"].length.should == @files.length
@@ -130,25 +124,25 @@ unless FrameworkFixture.framework
           File.read("#{@dest}/#{@versions[0]}_#{@files[0]}").include?("screen and (").should == true
         end
       end
-  
+      
       describe 'one version out of date' do
-    
+
         before(:all) do
           unless ENV['FAST']
-            FileUtils.mv "#{@dest}/#{@versions[0]}_#{@files[0]}", "#{@dest}/#{@old_version}_#{@files[0]}"
+            FileUtils.mv "#{@dest}/#{@versions[0]}_#{@files[0]}", "#{@dest}/00000000_#{@files[0]}"
           end
           @output = capture_stdout do
             SmartAsset.binary $root, @config
           end
         end
-  
+
         it "should generate correct filenames" do
           @files.each_with_index do |file, i|
             File.exists?("#{@dest}/#{@versions[i]}_#{file}").should == true
           end
           Dir["#{@dest}/*.{js,css}"].length.should == @files.length
         end
-    
+
         it "should create package files with content" do
           @files.each_with_index do |file, i|
             File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
@@ -164,6 +158,10 @@ unless FrameworkFixture.framework
           end
         end
         
+        it "should remove old version" do
+          Dir["#{@dest}/*.css"].length.should == 1
+        end
+
         unless ENV['FAST']
           it "should run updated file through the compressor" do
             @files.each_with_index do |file, i|
@@ -178,14 +176,11 @@ unless FrameworkFixture.framework
           
           before(:all) do
             @package_config = SmartAsset.config['javascripts']['package']
-            @old_version_path = "#{@dest}/javascripts.yml"
-            @old_version = File.read(@old_version_path)
             @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
             @old_package = File.read(@old_package_path)
           end
           
           after(:all) do
-            File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
             File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
           end
           
@@ -203,14 +198,10 @@ unless FrameworkFixture.framework
             end
         
             it "should rewrite javascript package with only jquery" do
-              @files.each_with_index do |file, i|
-                File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
-                if i == 1
-                  js = File.read(path)
-                  js.include?('jQuery').should == true
-                  js.include?('VERSION').should == false
-                end
-              end
+              File.size(path = "#{@dest}/b00ce510_#{@files[1]}").should > 0
+              js = File.read(path)
+              js.include?('jQuery').should == true
+              js.include?('VERSION').should == false
             end
         
             it "should run updated file through the compressor" do
@@ -218,13 +209,15 @@ unless FrameworkFixture.framework
                 @output.string.include?(file).should == (i == 1 ? true : false)
               end
             end
+            
+            it "should remove old version" do
+              Dir["#{@dest}/*.js"].length.should == 1
+            end
           end
         
           describe 'package removed' do
 
             before(:all) do
-              @old_version_path = "#{@dest}/javascripts.yml"
-              @old_version = File.read(@old_version_path)
               @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
               @old_package = File.read(@old_package_path)
 
@@ -235,22 +228,21 @@ unless FrameworkFixture.framework
             end
 
             after(:all) do
-              File.open(@old_version_path, 'w') { |f| f.write(@old_version) }
               File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
             end
 
             it "should delete the javascript package" do
-              File.exists?("#{@dest}/#{@versions[1]}_#{@files[1]}").should == false
+              Dir["#{@dest}/*.js"].length.should == 0
             end
           end
         
           describe 'untracked file' do
           
             before(:all) do
-              @modified = Time.now.utc
+              @modified = Time.parse('12-01-2010').utc
               ENV['MODIFIED'] = @modified.to_s
-              @package = "#{@dest}/#{@modified.strftime("%Y%m%d%H%M%S")}_#{@files[1]}"
-              @untracked = "#{@dest}/untracked.js"
+              @package = "#{@dest}/8166ebb0_#{@files[1]}"
+              @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
               
               File.open(@untracked, 'w') { |f| f.write("var untracked = true;") }
               SmartAsset.config['javascripts']['package'] << 'untracked'
@@ -266,11 +258,15 @@ unless FrameworkFixture.framework
             end
             
             it "should create package with default modified time" do
-              File.exists?(@untracked).should == true
+              File.exists?(@package).should == true
             end
             
             it "should create package with untracked file" do
-              File.read(@untracked).include?('var untracked').should == true
+              File.read(@package).include?('var untracked').should == true
+            end
+            
+            it "should remove old version" do
+              Dir["#{@dest}/*.js"].length.should == 1
             end
           end
         end

@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/smart_asset/gems'
 
 SmartAsset::Gems.require(:lib)
 
+require 'digest'
 require 'fileutils'
 require 'time'
 require 'yaml'
@@ -29,14 +30,9 @@ class SmartAsset
     def compress(type)
       dest = @dest[type]
       dir = "#{@pub}/#{@sources[type]}"
-      ext = ext_from_type type
-      version = {}
-      cache = {}
-      
-      # Read version yaml
-      if File.exists?(version_path = "#{dest}/#{type}.yml")
-        version = YAML::load(File.read(version_path))
-      end
+      ext = ext_from_type(type)
+      packages = []
+      time_cache = {}
       
       FileUtils.mkdir_p dest
       
@@ -44,24 +40,36 @@ class SmartAsset
         next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
         if files
           # Retrieve list of Git modified timestamps
-          modified = []
+          timestamps = []
           files.each do |file|
-            fname = "#{dir}/#{file}.#{ext}"
-            if File.exists?(fname)
-              mod = (cache[fname] ||= `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`)
-              if mod.strip.empty? || mod.include?('command not found')
-                modified << (ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now).utc.strftime("%Y%m%d%H%M%S")
+            if File.exists?("#{dir}/#{file}.#{ext}")
+              if time_cache[file]
+                time = time_cache[file]
               else
-                modified << Time.parse(mod).utc.strftime("%Y%m%d%H%M%S")
+                time = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
+                if time.strip.empty? || time.include?('command not found')
+                  time = ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now
+                else
+                  time = Time.parse(time)
+                end
+                time = time.utc.strftime("%Y%m%d%H%M%S")
+                time += file.to_s
+                time_cache[file] = time
               end
+              timestamps << time
             end
           end
-          modified = modified.sort.last
-          next unless modified
+          next if timestamps.empty?
           
-          # If package changed or package file doesn't exist
-          output = "#{dest}/#{modified}_#{package}.#{ext}"
-          if version[package] != files || !File.exists?(output)
+          # Modified hash
+          hash = Digest::SHA1.hexdigest(timestamps.sort.join)[0..7]
+          
+          # Package path
+          package = "#{dest}/#{hash}_#{package}.#{ext}"
+          packages << package
+          
+          # If package file does not exist
+          unless File.exists?(package)
             data = []
             
             # Join files in package
@@ -71,24 +79,20 @@ class SmartAsset
               end
             end
             
-            # Delete old package
-            Dir["#{dest}/*[0-9]_#{package}.#{ext}"].each do |old|
-              FileUtils.rm old
-            end
-            
             # Don't create new compressed file if no data
-            next if data.empty?
+            data = data.join("\n")
+            next if data.strip.empty?
             
             # Compress joined files
             tmp = "#{dest}/tmp.#{ext}"
-            File.open(tmp, 'w') { |f| f.write(data.join("\n")) }
-            puts "\nCreating #{output}..."
+            File.open(tmp, 'w') { |f| f.write(data) }
+            puts "\nCreating #{package}..."
             if ext == 'js'
               warning = ENV['WARN'] ? nil : " --warning_level QUIET"
-              cmd = "java -jar #{CLOSURE_COMPILER} --js #{tmp} --js_output_file #{output}#{warning}"
+              cmd = "java -jar #{CLOSURE_COMPILER} --js #{tmp} --js_output_file #{package}#{warning}"
             elsif ext == 'css'
               warning = ENV['WARN'] ? " -v" : nil
-              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{output}#{warning}"
+              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{package}#{warning}"
             end
             puts cmd if ENV['DEBUG']
             `#{cmd}`
@@ -97,25 +101,23 @@ class SmartAsset
             # Fix YUI compression issue
             if ext == 'css'
               if RUBY_PLATFORM.downcase.include?('darwin')
-                `sed -i '' 's/ and(/ and (/g' #{output}`
+                `sed -i '' 's/ and(/ and (/g' #{package}`
               else
-                `sed -i 's/ and(/ and (/g' #{output}`
+                `sed -i 's/ and(/ and (/g' #{package}`
               end
             end
           end
         end
       end
       
-      # Delete removed packages
-      (version.keys - (@config[type] || {}).keys).each do |package|
-        Dir["#{dest}/*[0-9]_#{package}.#{ext}"].each do |old|
-          FileUtils.rm old
-        end
+      # Remove old/unused packages
+      (Dir["#{dest}/????????_*.#{ext}"] - packages).each do |path|
+        FileUtils.rm path
       end
       
-      # Write version yaml file
-      if @config[type]
-        File.open(version_path, 'w') { |f| f.write(YAML::dump(@config[type])) }
+      # Delete legacy yml files
+      Dir["#{dest}/*.yml"].each do |path|
+        FileUtils.rm path
       end
     end
     
@@ -188,7 +190,7 @@ class SmartAsset
       
       if @envs.include?(@env.to_s)
         @cache[type][match] =
-          if result = Dir["#{dest}/*[0-9]_#{match}.#{ext}"].sort.last
+          if result = Dir["#{dest}/????????_#{match}.#{ext}"].sort.last
             [ result.gsub(@pub, '') ]
           else
             []
