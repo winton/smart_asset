@@ -62,7 +62,7 @@ class SmartAsset
           next if timestamps.empty?
           
           # Modified hash
-          hash = Digest::SHA1.hexdigest(timestamps.sort.join)[0..7]
+          hash = Digest::SHA1.hexdigest(timestamps.join)[0..7]
           
           # Package path
           package = "#{dest}/#{hash}_#{package}.#{ext}"

@@ -14,7 +14,7 @@ unless FrameworkFixture.framework
       )
       @versions = %w(
         4c0f7deb
-        91d1e5c5
+        1042e864
       )
     end
   
@@ -102,10 +102,12 @@ unless FrameworkFixture.framework
             File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
             if i == 0
               css = File.read(path)
-              css.include?('.container_12').should == true
+              css.index('.error').should < css.index('.container_12')
               css.include?('.error').should == true
+              css.include?('.container_12').should == true
             else
               js = File.read(path)
+              js.index('jQuery').should < js.index('VERSION')
               js.include?('jQuery').should == true
               js.include?('VERSION').should == true
             end
@@ -148,10 +150,12 @@ unless FrameworkFixture.framework
             File.size(path = "#{@dest}/#{@versions[i]}_#{file}").should > 0
             if i == 0
               css = File.read(path)
-              css.include?('.container_12').should == true
+              css.index('.error').should < css.index('.container_12')
               css.include?('.error').should == true
+              css.include?('.container_12').should == true
             else
               js = File.read(path)
+              js.index('jQuery').should < js.index('VERSION')
               js.include?('jQuery').should == true
               js.include?('VERSION').should == true
             end
@@ -186,6 +190,35 @@ unless FrameworkFixture.framework
           
           after(:each) do
             SmartAsset.config['javascripts']['package'] = @package_config
+          end
+          
+          describe 'package order changed' do
+        
+            before(:all) do
+              SmartAsset.config['javascripts']['package'].delete 'underscore'
+              SmartAsset.config['javascripts']['package'].unshift 'underscore'
+              @output = capture_stdout do
+                SmartAsset.compress 'javascripts'
+              end
+            end
+        
+            it "should rewrite javascript package with underscore code first" do
+              File.size(path = "#{@dest}/91d1e5c5_#{@files[1]}").should > 0
+              js = File.read(path)
+              js.index('jQuery').should > js.index('VERSION')
+              js.include?('jQuery').should == true
+              js.include?('VERSION').should == true
+            end
+        
+            it "should run updated file through the compressor" do
+              @files.each_with_index do |file, i|
+                @output.string.include?(file).should == (i == 1 ? true : false)
+              end
+            end
+            
+            it "should remove old version" do
+              Dir["#{@dest}/*.js"].length.should == 1
+            end
           end
           
           describe 'package child removed' do
@@ -241,7 +274,7 @@ unless FrameworkFixture.framework
             before(:all) do
               @modified = Time.parse('12-01-2010').utc
               ENV['MODIFIED'] = @modified.to_s
-              @package = "#{@dest}/8166ebb0_#{@files[1]}"
+              @package = "#{@dest}/0fabe271_#{@files[1]}"
               @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
               
               File.open(@untracked, 'w') { |f| f.write("var untracked = true;") }
