@@ -1,4 +1,7 @@
 append_random: false
+destination:
+  javascripts: packaged
+  stylesheets: packaged
 javascripts:
   package:
     - jquery/jquery

@@ -153,3 +153,20 @@ You may use environment variables with the <code>smart\_asset</code> command to 
 <pre>
 WARN=1 smart_asset
 </pre>
+
+Running Specs
+-------------
+
+Forks and contributions to this project are much appreciated, but please make sure the specs run!
+
+To run the basic specs:
+
+<pre>
+spec spec
+</pre>
+
+There are also framework specs to make sure the helpers work in Rails 2, Rails 3, and Sinatra 1:
+
+<pre>
+spec/run
+</pre>

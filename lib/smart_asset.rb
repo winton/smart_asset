@@ -194,7 +194,7 @@ class SmartAsset
       
       if @envs.include?(@env.to_s)
         @cache[type][match] =
-          if result = Dir["#{dest}/#{"[^_]"*8}_#{match}.#{ext}"].sort.last
+          if result = Dir["#{dest}/#{"[^_]"*8}_#{match}.#{ext}"].first
             [ result.gsub(@pub, '') ]
           else
             []

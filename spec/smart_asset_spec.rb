@@ -251,17 +251,10 @@ unless FrameworkFixture.framework
           describe 'package removed' do
 
             before(:all) do
-              @old_package_path = "#{@dest}/#{@versions[1]}_#{@files[1]}"
-              @old_package = File.read(@old_package_path)
-
               SmartAsset.config['javascripts'].delete 'package'
               @output = capture_stdout do
                 SmartAsset.compress 'javascripts'
               end
-            end
-
-            after(:all) do
-              File.open(@old_package_path, 'w') { |f| f.write(@old_package) }
             end
 
             it "should delete the javascript package" do
@@ -288,6 +281,7 @@ unless FrameworkFixture.framework
             after(:all) do
               ENV.delete 'MODIFIED'
               FileUtils.rm @untracked
+              FileUtils.rm @package
             end
             
             it "should create package with default modified time" do

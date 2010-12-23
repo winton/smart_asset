@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+system "spec -f n -c spec"
+
+puts "\n"
+
+ENV['RAILS'] = '2'
+ENV['RAILS_ENV'] = 'development'
+system "spec -f n -c spec"
+
+puts "\n"
+
+ENV['RAILS_ENV'] = 'production'
+system "spec -f n -c spec"
+
+puts "\n"
+
+ENV['RAILS'] = '3'
+ENV['RAILS_ENV'] = 'development'
+system "spec -f n -c spec"
+
+puts "\n"
+
+ENV['RAILS_ENV'] = 'production'
+system "spec -f n -c spec"
+
+ENV.delete 'RAILS'
+ENV.delete 'RAILS_ENV'
+
+puts "\n"
+
+ENV['SINATRA'] = '1'
+ENV['RACK_ENV'] = 'development'
+system "spec -f n -c spec"
+
+puts "\n"
+
+ENV['RACK_ENV'] = 'production'
+system "spec -f n -c spec"
