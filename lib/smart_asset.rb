@@ -42,7 +42,8 @@ class SmartAsset
           # Retrieve list of Git modified timestamps
           timestamps = []
           files.each do |file|
-            if File.exists?("#{dir}/#{file}.#{ext}")
+            file_path = "#{dir}/#{file}.#{ext}"
+            if File.exists?(file_path)
               if time_cache[file]
                 time = time_cache[file]
               else
@@ -57,6 +58,8 @@ class SmartAsset
                 time_cache[file] = time
               end
               timestamps << time
+            else
+              $stderr.puts "WARNING: '#{file_path}' was not found."
             end
           end
           next if timestamps.empty?
