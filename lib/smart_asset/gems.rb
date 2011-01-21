@@ -6,8 +6,8 @@ unless defined?(SmartAsset::Gems)
     class Gems
     
       VERSIONS = {
-        :framework_fixture => '0.1.2',
-        :'rack-test' => '0.5.6',
+        :framework_fixture => '0.1.3',
+        :'rack-test' => '0.5.7',
         :rake => '=0.8.7',
         :rspec => '=1.3.1'
       }
