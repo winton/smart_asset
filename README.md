@@ -60,6 +60,7 @@ javascripts:
   package_1:
     - jquery/jquery
     - underscore
+    - plugins/jquery.*
   package_2:
     - front_page
 stylesheets:

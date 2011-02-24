@@ -206,8 +206,7 @@ class SmartAsset
         result = @config[type].collect do |package, files|
           if package.to_s == match
             files.collect do |file|
-              file = "/#{@sources[type]}/#{file}.#{ext}"
-              file if File.exists?("#{@pub}/#{file}")
+              Dir.chdir(@pub) { Dir["#{@sources[type]}/#{file}.#{ext}"] }
             end
           end
         end
