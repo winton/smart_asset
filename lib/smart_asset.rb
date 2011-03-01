@@ -221,7 +221,7 @@ class SmartAsset
         host = @asset_host
       end
       
-      if host    
+      if host
         if !@asset_counter || @asset_counter == @config['asset_host_count']
           @asset_counter = 0
         end
@@ -231,7 +231,7 @@ class SmartAsset
       
         host.gsub('%d', count) + path
       else
-        path
+        "/#{path}"
       end
     end
     
