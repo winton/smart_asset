@@ -148,6 +148,8 @@ You may use environment variables with the <code>smart\_asset</code> command to 
 
 <code>WARN=1</code><br/>Get compression warnings from Closure Compiler and YUI Compressor
 
+<code>STOP_ON_ERROR=1</code><br/>smart_asset will exit if Closure Compiler or YUI Compressor return a non-zero exit code.
+
 #### Example:
 
 <pre>
