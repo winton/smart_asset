@@ -101,7 +101,7 @@ class SmartAsset
             puts cmd if ENV['DEBUG']
             `#{cmd}`
 
-            if ENV['STOP_ON_ERROR'] and $?.exitstatus !== 0
+            if ENV['STOP_ON_ERROR'] and $?.exitstatus != 0
               exit!($?.exitstatus)
             end
 
