@@ -100,6 +100,11 @@ class SmartAsset
             end
             puts cmd if ENV['DEBUG']
             `#{cmd}`
+
+            if ENV['STOP_ON_ERROR'] and $?.exitstatus !== 0
+              exit!($?.exitstatus)
+            end
+
             FileUtils.rm(tmp) unless ENV['DEBUG']
             
             # Fix YUI compression issue
