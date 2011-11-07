@@ -13,8 +13,7 @@ class SmartAsset
     attr_accessor :append_random, :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
-    CLOSURE_COMPILER = BIN + '/closure_compiler.jar'
-    YUI_COMPRESSOR = BIN + '/yui_compressor.jar'
+    YUI_COMPRESSOR = BIN + '/yuicompressor-2.4.6.jar'
     
     def binary(root, relative_config=nil)
       load_config root, relative_config
@@ -86,11 +85,10 @@ class SmartAsset
             tmp = "#{dest}/tmp.#{ext}"
             File.open(tmp, 'w') { |f| f.write(data) }
             puts "\nCreating #{package}..."
+            warning = ENV['WARN'] ? " -v" : nil
             if ext == 'js'
-              warning = ENV['WARN'] ? nil : " --warning_level QUIET"
-              cmd = "java -jar #{CLOSURE_COMPILER} --js #{tmp} --js_output_file #{package}#{warning}"
+              cmd = "uglifyjs --output #{package}#{warning} -nc #{tmp}"
             elsif ext == 'css'
-              warning = ENV['WARN'] ? " -v" : nil
               cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{package}#{warning}"
             end
             puts cmd if ENV['DEBUG']
