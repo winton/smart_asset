@@ -1,7 +1,3 @@
-require File.dirname(__FILE__) + '/smart_asset/gems'
-
-SmartAsset::Gems.require(:lib)
-
 require 'digest'
 require 'fileutils'
 require 'time'
@@ -10,7 +6,6 @@ require 'yaml'
 $:.unshift File.dirname(__FILE__)
 
 require 'smart_asset/helper'
-require 'smart_asset/version'
 
 class SmartAsset
   class <<self

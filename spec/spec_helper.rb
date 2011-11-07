@@ -1,30 +1,19 @@
+require "pp"
+require "stringio"
+
+require "bundler/setup"
+
 $root = File.expand_path('../../', __FILE__)
-require "#{$root}/lib/smart_asset/gems"
 
-SmartAsset::Gems.require(:spec_first)
-
+gem('framework_fixture', '0.1.3')
 require 'framework_fixture'
 
 FrameworkFixture.generate File.dirname(__FILE__) + '/fixtures'
-SmartAsset::Gems.require(:spec)
 
 require 'rack/test'
 
 unless FrameworkFixture.framework
   require "#{$root}/lib/smart_asset"
-end
-
-require 'pp'
-require 'stringio'
-
-Spec::Runner.configure do |config|
-end
-
-# For use with rspec textmate bundle
-def debug(object)
-  puts "<pre>"
-  puts object.pretty_inspect.gsub('<', '&lt;').gsub('>', '&gt;')
-  puts "</pre>"
 end
 
 def capture_stdout

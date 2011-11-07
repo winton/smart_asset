@@ -1,6 +1,7 @@
 .DS_Store
 *.gem
-coverage
+.bundle
+Gemfile.lock
 pkg
 spec/fixtures/assets/compressed
 spec/fixtures/assets/compressed/*
