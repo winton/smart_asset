@@ -251,3 +251,4 @@ end
 
 require "smart_asset/adapters/rails#{Rails.version[0..0]}" if defined?(Rails)
 require "smart_asset/adapters/sinatra" if defined?(Sinatra)
+require "smart_asset/adapters/stasis" if defined?(Stasis)
