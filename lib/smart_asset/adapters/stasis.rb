@@ -29,6 +29,7 @@ class SmartAsset
     end
 
     def before_render
+      return if stasis.options[:development]
       if @stasis.path =~ REGEX
         @asset_rendered = true
       elsif @asset_rendered && !@packaged
