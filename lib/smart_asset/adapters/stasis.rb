@@ -9,7 +9,7 @@ class SmartAsset
     def initialize(stasis)
       @stasis = stasis
 
-      SmartAsset.env = 'production'
+      SmartAsset.env = stasis.options[:development] ? 'development' : 'production'
       SmartAsset.load_config(@stasis.root)
     end
 
