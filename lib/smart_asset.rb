@@ -124,6 +124,10 @@ class SmartAsset
     def load_config(root, relative_config=nil)
       relative_config ||= 'config/assets.yml'
       @root = File.expand_path(root)
+
+      return unless File.file?("#{@root}/#{relative_config}")
+
+      @cache = nil
       @config = YAML::load(File.read("#{@root}/#{relative_config}"))
       
       # Default values
