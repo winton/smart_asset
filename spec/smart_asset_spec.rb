@@ -276,6 +276,7 @@ unless FrameworkFixture.framework
               @output = capture_stdout do
                 SmartAsset.compress 'javascripts'
               end
+              puts @output.string
             end
             
             after(:all) do
