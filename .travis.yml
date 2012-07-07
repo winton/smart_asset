@@ -1,3 +1,4 @@
+before_install: "gem install change && cat /home/vagrant/.rvm/gems/*/gems/change-0.1.0/ext/change/gem_make.out"
 language: ruby
 rvm:
   - 1.8.7
