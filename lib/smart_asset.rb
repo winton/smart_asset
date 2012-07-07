@@ -26,6 +26,10 @@ class SmartAsset
       ext = ext_from_type(type)
       packages = []
       time_cache = {}
+
+      change = Change.new(dir)
+      change.d
+      states = change.send(:states)
       
       FileUtils.mkdir_p dest
       
@@ -33,10 +37,6 @@ class SmartAsset
         next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
         if files
           # Generate file hashes
-          change = Change.new(dir)
-          change.d
-          states = change.send(:states)
-
           hashes = files.inject([]) do |array, file|
             path = "#{file}.#{ext}"
             if states[path]
