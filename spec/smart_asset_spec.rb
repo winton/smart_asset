@@ -265,9 +265,9 @@ unless FrameworkFixture.framework
           describe 'untracked file' do
           
             before(:all) do
-              @modified = Time.parse('12-01-2010').utc
+              puts Time.parse('12-01-2010 00:00:00 UTC').inspect
+              @modified = Time.parse('12-01-2010 00:00:00 UTC')
               ENV['MODIFIED'] = @modified.to_s
-              puts ENV['MODIFIED'].inspect
               @package = "#{@dest}/0fabe271_#{@files[1]}"
               @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
               
@@ -277,7 +277,6 @@ unless FrameworkFixture.framework
               @output = capture_stdout do
                 SmartAsset.compress 'javascripts'
               end
-              puts @output.string
             end
             
             after(:all) do
