@@ -5,4 +5,7 @@ Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_files = FileList['spec/**/*_spec.rb']
 end
 
-task :default => :spec
+task :default do
+  system("npm install -g")
+  Rake::Task['spec'].execute
+end
