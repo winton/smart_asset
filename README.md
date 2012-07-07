@@ -1,7 +1,7 @@
 SmartAsset
 ===========
 
-Smart asset packaging for Rails and Sinatra.
+Smart asset packaging for Rails, Sinatra, and Stasis.
 
 [![Build Status](https://secure.travis-ci.org/winton/smart_asset.png)](http://travis-ci.org/winton/smart_asset)
 
@@ -12,18 +12,27 @@ Similar to <code>AssetPackager</code>, but with the following changes:
 
 * Git modified date/time for package version (only re-packages files that have been modified)
 * [UglifyJS](https://github.com/mishoo/UglifyJS) for javascript compression
-* Framework agnostic (adapters provided for Rails 2, Rails 3, and Sinatra)
+* [clean-css](https://github.com/GoalSmashers/clean-css) for css compression
+* Framework agnostic (adapters provided for Rails 2, Rails 3, Sinatra, and Stasis)
 
 <a name="installation"></a>
 
 Installation
 ------------
 
-### Install Gem
+### Install gem
 
 <pre>
 gem install smart_asset
 </pre>
+
+### Install npm packages
+
+<pre>
+npm install uglify-js clean-css -g
+</pre>
+
+### Install 
 
 ### Rails 2
 
