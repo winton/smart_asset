@@ -2,6 +2,7 @@
 	"name": "smart_asset",
 	"version": "0.1.0",
 	"dependencies": {
+		"clean-css": "",
 		"uglify-js": ""
 	}
 }

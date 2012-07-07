@@ -12,9 +12,6 @@ class SmartAsset
     
     attr_accessor :append_random, :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
-    BIN = File.expand_path(File.dirname(__FILE__) + '/../bin')
-    YUI_COMPRESSOR = BIN + '/yuicompressor-2.4.6.jar'
-    
     def binary(root, relative_config=nil)
       load_config root, relative_config
       compress 'javascripts'
@@ -89,7 +86,7 @@ class SmartAsset
             if ext == 'js'
               cmd = "uglifyjs --output #{package}#{warning} -nc #{tmp}"
             elsif ext == 'css'
-              cmd = "java -jar #{YUI_COMPRESSOR} #{tmp} -o #{package}#{warning}"
+              cmd = "cleancss #{tmp} -o #{package}#{warning}"
             end
             puts cmd if ENV['DEBUG']
             `#{cmd}`
