@@ -43,9 +43,7 @@ class SmartAsset
               else
                 time = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
                 if time.strip.empty? || time.include?('command not found')
-                  puts '!!!'
                   time = ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now
-                  puts time.inspect
                 else
                   time = Time.parse(time)
                 end
