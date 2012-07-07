@@ -3,6 +3,8 @@ require 'fileutils'
 require 'time'
 require 'yaml'
 
+require "change"
+
 $:.unshift File.dirname(__FILE__)
 
 require 'smart_asset/helper'
@@ -30,33 +32,22 @@ class SmartAsset
       (@config[type] || {}).each do |package, files|
         next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
         if files
-          # Retrieve list of Git modified timestamps
-          timestamps = []
-          files.each do |file|
-            file_path = "#{dir}/#{file}.#{ext}"
-            if File.exists?(file_path)
-              if time_cache[file]
-                time = time_cache[file]
-              else
-                time = `cd #{@root} && git log --pretty=format:%cd -n 1 --date=iso #{@config['public']}/#{@sources[type]}/#{file}.#{ext}`
-                if time.strip.empty? || time.include?('command not found')
-                  time = ENV['MODIFIED'] ? Time.parse(ENV['MODIFIED']) : Time.now
-                else
-                  time = Time.parse(time)
-                end
-                time = time.utc.strftime("%Y%m%d%H%M%S")
-                time += file.to_s
-                time_cache[file] = time
-              end
-              timestamps << time
-            else
-              $stderr.puts "WARNING: '#{file_path}' was not found."
+          # Generate file hashes
+          change = Change.new(dir)
+          change.d
+          states = change.send(:states)
+
+          hashes = files.inject([]) do |array, file|
+            path = "#{file}.#{ext}"
+            if states[path]
+              array << "#{states[path][:size]}#{states[path][:hash]}"
             end
+            array
           end
-          next if timestamps.empty?
+          next if hashes.empty?
           
           # Modified hash
-          hash = Digest::SHA1.hexdigest(timestamps.join)[0..7]
+          hash = Digest::SHA1.hexdigest(hashes.join)[0..7]
           
           # Package path
           package = "#{dest}/#{hash}_#{package}.#{ext}"

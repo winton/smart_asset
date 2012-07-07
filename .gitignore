@@ -4,6 +4,7 @@
 Gemfile.lock
 node_modules
 pkg
+spec/fixtures/assets/*/.change.yml
 spec/fixtures/assets/compressed
 spec/fixtures/assets/compressed/*
 spec/fixtures/builds

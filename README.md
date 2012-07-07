@@ -10,8 +10,8 @@ Features
 
 Similar to <code>AssetPackager</code>, but with the following changes:
 
-* Git modified date/time for package version (only re-packages files that have been modified)
-* [UglifyJS](https://github.com/mishoo/UglifyJS) for javascript compression
+* Uses file size and super fast hashing ([Murmur3](https://github.com/PeterScott/murmur3)) to determine if a new compressed package should be created
+* [uglify-js](https://github.com/mishoo/UglifyJS) for javascript compression
 * [clean-css](https://github.com/GoalSmashers/clean-css) for css compression
 * Framework agnostic (adapters provided for Rails 2, Rails 3, Sinatra, and Stasis)
 

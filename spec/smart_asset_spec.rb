@@ -13,8 +13,8 @@ unless FrameworkFixture.framework
         package.js
       )
       @versions = %w(
-        4c0f7deb
-        1042e864
+        63bae034
+        541a83e3
       )
     end
   
@@ -203,7 +203,7 @@ unless FrameworkFixture.framework
             end
         
             it "should rewrite javascript package with underscore code first" do
-              File.size(path = "#{@dest}/91d1e5c5_#{@files[1]}").should > 0
+              File.size(path = "#{@dest}/dbd79469_#{@files[1]}").should > 0
               js = File.read(path)
               js.index('jQuery').should > js.index('VERSION')
               js.include?('jQuery').should == true
@@ -231,7 +231,7 @@ unless FrameworkFixture.framework
             end
         
             it "should rewrite javascript package with only jquery" do
-              File.size(path = "#{@dest}/b00ce510_#{@files[1]}").should > 0
+              File.size(path = "#{@dest}/18f448b8_#{@files[1]}").should > 0
               js = File.read(path)
               js.include?('jQuery').should == true
               js.include?('VERSION').should == false
@@ -267,7 +267,7 @@ unless FrameworkFixture.framework
             before(:all) do
               @modified = Time.parse('12-01-2010 08:00:00 UTC')
               ENV['MODIFIED'] = @modified.to_s
-              @package = "#{@dest}/0fabe271_#{@files[1]}"
+              @package = "#{@dest}/c3939102_#{@files[1]}"
               @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
               
               File.open(@untracked, 'w') { |f| f.write("var untracked = true;") }
