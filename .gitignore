@@ -2,6 +2,7 @@
 *.gem
 .bundle
 Gemfile.lock
+node_modules
 pkg
 spec/fixtures/assets/compressed
 spec/fixtures/assets/compressed/*
