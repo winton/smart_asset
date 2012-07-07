@@ -3,6 +3,8 @@ SmartAsset
 
 Smart asset packaging for Rails and Sinatra.
 
+[![Build Status](https://secure.travis-ci.org/winton/smart_asset.png)](http://travis-ci.org/winton/smart_asset)
+
 Features
 --------
 
