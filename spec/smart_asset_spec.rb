@@ -267,6 +267,7 @@ unless FrameworkFixture.framework
             before(:all) do
               @modified = Time.parse('12-01-2010').utc
               ENV['MODIFIED'] = @modified.to_s
+              puts ENV['MODIFIED'].inspect
               @package = "#{@dest}/0fabe271_#{@files[1]}"
               @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
               
