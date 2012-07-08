@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>SmartAsset by winton</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>SmartAsset</h1>
+        <p>Smart asset packaging for Rails, Sinatra, and Stasis</p>
+        <p class="view"><a href="https://github.com/winton/smart_asset">View the Project on GitHub <small>winton/smart_asset</small></a></p>
+        <ul>
+          <li><a href="https://github.com/winton/smart_asset/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/winton/smart_asset/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/winton/smart_asset">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>Similar to <a href="https://github.com/sbecker/asset_packager">AssetPackager</a>, but with the following changes:</p>
+
+<ul>
+<li>Uses file size and super fast hashing (<a href="https://github.com/PeterScott/murmur3">Murmur3</a>) to determine if a new compressed package should be created</li>
+<li>
+<a href="https://github.com/mishoo/UglifyJS">uglify-js</a> for javascript compression</li>
+<li>
+<a href="https://github.com/GoalSmashers/clean-css">clean-css</a> for css compression</li>
+<li>Framework agnostic (adapters provided for Rails 2, Rails 3, Sinatra, and Stasis)</li>
+</ul><p><a name="installation"></a></p>
+
+<h2>Installation</h2>
+
+<h3>Install gem</h3>
+
+<pre>
+gem install smart_asset
+</pre>
+
+<h3>Install npm packages</h3>
+
+<pre>
+npm install uglify-js clean-css -g
+</pre>
+
+<h3>Install</h3>
+
+<h3>Rails 2</h3>
+
+<h4>config/environment.rb</h4>
+
+<pre>
+config.gem 'smart_asset'
+</pre>
+
+<h3>Rails 3</h3>
+
+<h4>Gemfile</h4>
+
+<pre>
+gem 'smart_asset'
+</pre>
+
+<h3>Sinatra</h3>
+
+<pre>
+require 'sinatra/base'
+require 'smart_asset'
+
+class Application &lt; Sinatra::Base
+  include SmartAsset::Adapters::Sinatra
+end
+</pre>
+
+<h2>Create Configuration File</h2>
+
+<h3>config/assets.yml</h3>
+
+<pre>
+javascripts:
+  package_1:
+    - jquery/jquery
+    - underscore
+  package_2:
+    - front_page
+stylesheets:
+  package_1:
+    - blueprint/blueprint
+    - 960
+  package_2:
+    - front_page
+</pre>
+
+<p>By default, SmartAsset will look for assets in <code>public/javascripts</code> and <code>public/stylesheets</code>.</p>
+
+<h2>Create Packaged Assets</h2>
+
+<p><code>cd</code> to your project and run</p>
+
+<pre>
+smart_asset
+</pre>
+
+<p>If your project is Git version controlled, only the assets that have changed are repackaged.</p>
+
+<p>Otherwise, all packages generate every time.</p>
+
+<h2>Include Packages in Your Template</h2>
+
+<pre>
+&lt;%= javascript_include_merged :package_1, :package_2 %&gt;
+&lt;%= stylesheet_link_merged :package_1, :package_2 %&gt;
+</pre>
+
+<h2>Migrating from AssetPackager</h2>
+
+<ul>
+<li><code>rm vendor/plugins/asset_packager</code></li>
+<li><a href="#installation">Install SmartAsset</a></li>
+<li>Move <code>config/asset_packages.yml</code> to <code>config/assets.yml</code>
+</li>
+<li>Instead of running <code>rake asset:packager:build_all</code>, run <code>smart_asset</code>
+</li>
+</ul><h2>Other Options</h2>
+
+<h3>config/assets.yml</h3>
+
+<p>You may add extra options to your <code>config/assets.yml</code> file.</p>
+
+<p>Below are the default values (excluding <code>asset_host</code>):</p>
+
+<pre>
+# Append random numbers to script paths on each request
+append_random:
+  development: true
+
+# Asset host URL (defaults to ActionController::Base.asset_host or nil)
+asset_host:
+  production: http://assets%d.mydomain.com
+
+# How many asset hosts you have (use if asset_host defined with %d)
+asset_host_count: 4
+
+# Public directory
+public: public
+
+# Package destination directory (within the public directory)
+destination:
+  javascripts: javascripts/packaged
+  stylesheets: stylesheets/packaged
+
+# Asset source directories (within the public directory)
+sources:
+  javascripts: javascripts
+  stylesheets: stylesheets
+</pre>
+
+<h3>smart_asset</h3>
+
+<p>You may use environment variables with the <code>smart_asset</code> command to alter its behavior.</p>
+
+<p><code>DEBUG=1</code><br>Output commands that are running, leave the tmp file around for inspection</p>
+
+<p><code>PACKAGE=package_1</code><br>Only compress a specific package</p>
+
+<p><code>MODIFIED='12/1/2010 12:00'</code><br>Use a default modified time other than Time.now for non-version controlled files</p>
+
+<p><code>WARN=1</code><br>Get compression warnings from UglifyJS and YUI Compressor</p>
+
+<h4>Example:</h4>
+
+<pre>
+WARN=1 smart_asset
+</pre>
+
+<h2>Running Specs</h2>
+
+<p>Forks and contributions to this project are much appreciated, but please make sure the specs run!</p>
+
+<p>To run the basic specs:</p>
+
+<pre>
+spec spec
+</pre>
+
+<p>There are also framework specs to make sure the helpers work in Rails 2, Rails 3, and Sinatra 1:</p>
+
+<pre>
+spec/run
+</pre>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/winton">winton</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
