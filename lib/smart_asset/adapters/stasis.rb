@@ -8,12 +8,12 @@ class SmartAsset
 
     def initialize(stasis)
       @stasis = stasis
-
-      SmartAsset.env = stasis.options[:development] ? 'development' : 'production'
       SmartAsset.load_config(@stasis.root)
     end
 
     def before_all
+      SmartAsset.env = @stasis.options[:development] ?
+        'development' : 'production'
       SmartAsset.cache = nil
       
       @asset_rendered = false

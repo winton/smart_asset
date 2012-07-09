@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rails", "~> 3.0"
   s.add_development_dependency "rspec", "~> 1.0"
   s.add_development_dependency "sinatra", "~> 1.0"
+  s.add_development_dependency "stasis", "~> 0.0"
 
   s.add_dependency "change"
 end

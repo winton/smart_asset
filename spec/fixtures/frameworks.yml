@@ -31,3 +31,10 @@ sinatra:
     all_frameworks:
       - test.html.erb
       - config/assets.yml
+stasis:
+  <1:
+    stasis:
+      - controller.rb
+    all_frameworks:
+      - test.html.erb
+      - config/assets.yml

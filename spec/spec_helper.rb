@@ -2,12 +2,11 @@ require "pp"
 require "stringio"
 
 require "bundler/setup"
+require "stasis"
 
 $root = File.expand_path('../../', __FILE__)
 
-gem 'framework_fixture'
 require 'framework_fixture'
-
 FrameworkFixture.generate File.dirname(__FILE__) + '/fixtures'
 
 require 'rack/test'
@@ -28,5 +27,5 @@ end
 
 def equals_output(type, output)
   output = output.gsub("\n", '')
-  File.read("#{$root}/spec/fixtures/#{type}_output.txt").gsub("\n", '')
+  output.should == File.read("#{$root}/spec/fixtures/#{type}_output.txt").gsub("\n", '')
 end
