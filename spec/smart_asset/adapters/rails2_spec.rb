@@ -13,7 +13,6 @@ if FrameworkFixture.rails == '<3'
       assets = "#{$root}/spec/fixtures/assets"
       pub = "#{$root}/spec/fixtures/builds/rails2/public"
       FileUtils.rm_rf "#{pub}/packaged"
-      FileUtils.cp_r "#{assets}/compressed", "#{pub}/packaged"
       FileUtils.rm_rf "#{pub}/javascripts"
       FileUtils.cp_r "#{assets}/javascripts", "#{pub}/javascripts"
       FileUtils.rm_rf "#{pub}/stylesheets"

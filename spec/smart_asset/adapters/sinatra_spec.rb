@@ -14,7 +14,6 @@ if FrameworkFixture.sinatra
       pub = "#{$root}/spec/fixtures/builds/sinatra#{FrameworkFixture.exact_version[0..0]}/public"
       FileUtils.mkdir_p pub
       FileUtils.rm_rf "#{pub}/packaged"
-      FileUtils.cp_r "#{assets}/compressed", "#{pub}/packaged"
       FileUtils.rm_rf "#{pub}/javascripts"
       FileUtils.cp_r "#{assets}/javascripts", "#{pub}/javascripts"
       FileUtils.rm_rf "#{pub}/stylesheets"
