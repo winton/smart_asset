@@ -6,6 +6,6 @@ Spec::Rake::SpecTask.new(:spec) do |t|
 end
 
 task :default do
-  system("npm install")
+  system("npm install -g")
   Rake::Task['spec'].execute
 end

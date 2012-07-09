@@ -7,7 +7,7 @@ if FrameworkFixture.stasis
       @stasis = FrameworkFixture.app.call
       @build = "#{$root}/spec/fixtures/builds/stasis#{FrameworkFixture.exact_version[0..0]}"
       setup_adapter_build("#{@build}/public", "#{@build}_output")
-      Dir.chdir(build) { `#{$root}/bin/smart_asset` }
+      SmartAsset.binary @build
     end
     
     %w(production development).each do |env|

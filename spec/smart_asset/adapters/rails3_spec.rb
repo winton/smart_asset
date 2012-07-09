@@ -12,7 +12,7 @@ if FrameworkFixture.rails == '<4'
     before(:all) do
       build = "#{$root}/spec/fixtures/builds/rails3"
       setup_adapter_build("#{build}/public")
-      Dir.chdir(build) { `#{$root}/bin/smart_asset` } if Rails.env == 'production'
+      SmartAsset.binary(build) if Rails.env == 'production'
     end
   
     it "should have a pulse" do
