@@ -5,7 +5,7 @@ require "bundler/setup"
 
 $root = File.expand_path('../../', __FILE__)
 
-gem('framework_fixture', '0.1.3')
+gem 'framework_fixture'
 require 'framework_fixture'
 
 FrameworkFixture.generate File.dirname(__FILE__) + '/fixtures'
@@ -24,4 +24,9 @@ def capture_stdout
   return out
 ensure
   $stdout = old
+end
+
+def equals_output(type, output)
+  output = output.gsub("\n", '')
+  File.read("#{$root}/spec/fixtures/#{type}_output.txt").gsub("\n", '')
 end

@@ -157,7 +157,7 @@ You may use environment variables with the <code>smart\_asset</code> command to 
 
 <code>MODIFIED='12/1/2010 12:00'</code><br/>Use a default modified time other than Time.now for non-version controlled files
 
-<code>WARN=1</code><br/>Get compression warnings from UglifyJS and YUI Compressor
+<code>WARN=1</code><br/>Get compression warnings from UglifyJS
 
 #### Example:
 

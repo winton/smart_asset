@@ -1,5 +1,4 @@
 <script src="/javascripts/jquery/jquery.js"></script>
 <script src="/javascripts/underscore.js"></script>
-
 <link href="/stylesheets/blueprint/blueprint.css" media="screen" rel="stylesheet" />
 <link href="/stylesheets/960.css" media="screen" rel="stylesheet" />
