@@ -5,15 +5,9 @@ if FrameworkFixture.stasis
     
     before(:all) do
       @stasis = FrameworkFixture.app.call
-      assets = "#{$root}/spec/fixtures/assets"
       @build = "#{$root}/spec/fixtures/builds/stasis#{FrameworkFixture.exact_version[0..0]}"
-      FileUtils.mkdir_p "#{@build}/public"
-      FileUtils.mkdir_p "#{@build}_output"
-      FileUtils.rm_rf "#{@build}_output/packaged"
-      FileUtils.rm_rf "#{@build}/public/javascripts"
-      FileUtils.cp_r "#{assets}/javascripts", "#{@build}/public/javascripts"
-      FileUtils.rm_rf "#{@build}/public/stylesheets"
-      FileUtils.cp_r "#{assets}/stylesheets", "#{@build}/public/stylesheets"
+      setup_adapter_build("#{@build}/public", "#{@build}_output")
+      Dir.chdir(build) { `#{$root}/bin/smart_asset` }
     end
     
     %w(production development).each do |env|

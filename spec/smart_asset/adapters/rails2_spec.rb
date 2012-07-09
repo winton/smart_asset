@@ -10,13 +10,9 @@ if FrameworkFixture.rails == '<3'
     end
     
     before(:all) do
-      assets = "#{$root}/spec/fixtures/assets"
-      pub = "#{$root}/spec/fixtures/builds/rails2/public"
-      FileUtils.rm_rf "#{pub}/packaged"
-      FileUtils.rm_rf "#{pub}/javascripts"
-      FileUtils.cp_r "#{assets}/javascripts", "#{pub}/javascripts"
-      FileUtils.rm_rf "#{pub}/stylesheets"
-      FileUtils.cp_r "#{assets}/stylesheets", "#{pub}/stylesheets"
+      build = "#{$root}/spec/fixtures/builds/rails2"
+      setup_adapter_build("#{build}/public")
+      Dir.chdir(build) { `#{$root}/bin/smart_asset` } if Rails.env == 'production'
     end
   
     it "should have a pulse" do
@@ -24,11 +20,9 @@ if FrameworkFixture.rails == '<3'
       last_response.body.should == '1'
     end
     
-    describe Rails.env do
-      it "should execute helpers correctly" do
-        get "/test"
-        equals_output(Rails.env, last_response.body)
-      end
+    it "should execute helpers correctly" do
+      get "/test"
+      equals_output(Rails.env, last_response.body)
     end
   end
 end

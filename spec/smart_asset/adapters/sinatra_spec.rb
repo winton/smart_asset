@@ -10,14 +10,9 @@ if FrameworkFixture.sinatra
     end
     
     before(:all) do
-      assets = "#{$root}/spec/fixtures/assets"
-      pub = "#{$root}/spec/fixtures/builds/sinatra#{FrameworkFixture.exact_version[0..0]}/public"
-      FileUtils.mkdir_p pub
-      FileUtils.rm_rf "#{pub}/packaged"
-      FileUtils.rm_rf "#{pub}/javascripts"
-      FileUtils.cp_r "#{assets}/javascripts", "#{pub}/javascripts"
-      FileUtils.rm_rf "#{pub}/stylesheets"
-      FileUtils.cp_r "#{assets}/stylesheets", "#{pub}/stylesheets"
+      build = "#{$root}/spec/fixtures/builds/sinatra#{FrameworkFixture.exact_version[0..0]}"
+      setup_adapter_build("#{build}/public")
+      Dir.chdir(build) { `#{$root}/bin/smart_asset` } if SmartAsset.env == :production
     end
   
     it "should have a pulse" do
@@ -25,11 +20,9 @@ if FrameworkFixture.sinatra
       last_response.body.should == '1'
     end
     
-    describe Sinatra::Base.environment do
-      it "should execute helpers correctly" do
-        get "/test"
-        equals_output(Sinatra::Base.environment, last_response.body)
-      end
+    it "should execute helpers correctly" do
+      get "/test"
+      equals_output(Sinatra::Base.environment, last_response.body)
     end
   end
 end
