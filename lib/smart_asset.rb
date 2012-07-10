@@ -76,11 +76,8 @@ class SmartAsset
             warning = ENV['WARN'] ? " -v" : nil
 
             unless @bin
-              @bin = Dir.chdir(@root) { `npm bin` }
-              puts '!'*50
-              puts @root
-              puts @bin
-              @bin = File.exists?(@bin) ? "#{@bin}/" : nil
+              @bin = Dir.chdir(@root) { `npm bin`.strip }
+              @bin = File.directory?(@bin) ? "#{@bin}/" : nil
             end
             
             if ext == 'js'
