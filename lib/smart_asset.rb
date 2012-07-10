@@ -74,10 +74,15 @@ class SmartAsset
             File.open(tmp, 'w') { |f| f.write(data) }
             puts "\nCreating #{package}..."
             warning = ENV['WARN'] ? " -v" : nil
+
             unless @bin
               @bin = Dir.chdir(@root) { `npm bin` }
+              puts '!'*50
+              puts @root
+              puts @bin
               @bin = File.exists?(@bin) ? "#{@bin}/" : nil
             end
+            
             if ext == 'js'
               cmd = "#{@bin}uglifyjs --output #{package}#{warning} -nc #{tmp}"
             elsif ext == 'css'
