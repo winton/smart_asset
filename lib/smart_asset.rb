@@ -75,7 +75,7 @@ class SmartAsset
             puts "\nCreating #{package}..."
             warning = ENV['WARN'] ? " -v" : nil
             unless @bin
-              @bin = `npm bin`
+              @bin = Dir.chdir(@root) { `npm bin` }
               @bin = File.exists?(@bin) ? "#{@bin}/" : nil
             end
             if ext == 'js'
