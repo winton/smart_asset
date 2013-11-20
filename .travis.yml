@@ -1,11 +1,4 @@
 language: ruby
-env:
-  - ""
-  - SINATRA=1 RACK_ENV=development
-  - SINATRA=1 RACK_ENV=production
-  - RAILS=3   RAILS_ENV=development
-  - RAILS=3   RAILS_ENV=production
-  - STASIS=0
 rvm:
   - 1.8.7
   - 1.9.2
