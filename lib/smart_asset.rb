@@ -15,8 +15,11 @@ class SmartAsset
     attr_accessor :append_random, :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     def binary(root, relative_config=nil)
+      STDOUT.puts 'a'
       load_config root, relative_config
+      STDOUT.puts 'b'
       compress 'javascripts'
+      STDOUT.puts 'c'
       compress 'stylesheets'
     end
     
