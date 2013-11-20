@@ -85,9 +85,12 @@ class SmartAsset
             elsif ext == 'css'
               cmd = "#{@bin}cleancss --skip-advanced #{tmp} -o #{package}"
             end
+
             puts cmd if ENV['DEBUG']
             cmd_output = `#{cmd}`
-            raise ShellError, "Error running `#{cmd}`, output:\n#{cmd_output.to_s}" unless $?.success?
+
+            raise "Error running `#{cmd}`:\n#{cmd_output}"  unless $?.success?
+            
             FileUtils.rm(tmp) unless ENV['DEBUG']
             
             # Fix YUI compression issue
@@ -240,8 +243,6 @@ class SmartAsset
     end
   end
 end
-
-class ShellError < StandardError; end
 
 require "smart_asset/adapters/rails#{Rails.version[0..0]}" if defined?(Rails)
 require "smart_asset/adapters/sinatra" if defined?(Sinatra)
