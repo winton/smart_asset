@@ -12,8 +12,8 @@ describe SmartAsset do
       package.js
     )
     @versions = %w(
-      63bae034
-      541a83e3
+      fa00472f
+      382823ce
     )
   end
 
@@ -202,7 +202,7 @@ describe SmartAsset do
           end
       
           it "should rewrite javascript package with underscore code first" do
-            File.size(path = "#{@dest}/dbd79469_#{@files[1]}").should > 0
+            File.size(path = "#{@dest}/4922c055_#{@files[1]}").should > 0
             js = File.read(path)
             js.index('jQuery').should > js.index('VERSION')
             js.include?('jQuery').should == true
@@ -230,7 +230,7 @@ describe SmartAsset do
           end
       
           it "should rewrite javascript package with only jquery" do
-            File.size(path = "#{@dest}/18f448b8_#{@files[1]}").should > 0
+            File.size(path = "#{@dest}/5b838e70_#{@files[1]}").should > 0
             js = File.read(path)
             js.include?('jQuery').should == true
             js.include?('VERSION').should == false
@@ -266,7 +266,7 @@ describe SmartAsset do
           before(:all) do
             @modified = Time.parse('12-01-2010 08:00:00 UTC')
             ENV['MODIFIED'] = @modified.to_s
-            @package = "#{@dest}/c3939102_#{@files[1]}"
+            @package = "#{@dest}/73af2a89_#{@files[1]}"
             @untracked = "#{$root}/spec/fixtures/assets/javascripts/untracked.js"
             
             File.open(@untracked, 'w') { |f| f.write("var untracked = true;") }
