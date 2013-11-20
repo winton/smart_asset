@@ -81,9 +81,9 @@ class SmartAsset
             end
             
             if ext == 'js'
-              cmd = "#{@bin}uglifyjs --output #{package}#{warning} -nc #{tmp}"
+              cmd = "#{@bin}uglifyjs --output #{package}#{warning} #{tmp}"
             elsif ext == 'css'
-              cmd = "#{@bin}cleancss #{tmp} -o #{package}"
+              cmd = "#{@bin}cleancss --skip-advanced #{tmp} -o #{package}"
             end
             puts cmd if ENV['DEBUG']
             cmd_output = `#{cmd}`
