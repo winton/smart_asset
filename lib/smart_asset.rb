@@ -15,11 +15,8 @@ class SmartAsset
     attr_accessor :append_random, :asset_host, :asset_counter, :cache, :config, :dest, :env, :envs, :pub, :root, :sources
     
     def binary(root, relative_config=nil)
-      STDOUT.puts 'a'
       load_config root, relative_config
-      STDOUT.puts 'b'
       compress 'javascripts'
-      STDOUT.puts 'c'
       compress 'stylesheets'
     end
     
@@ -30,14 +27,19 @@ class SmartAsset
       packages = []
       time_cache = {}
 
+      STDOUT.puts 'a'
+
       change = Change.new(dir)
       change.d
       states = change.send(:states)
       
       FileUtils.mkdir_p dest
+
+      STDOUT.puts 'b'
       
       (@config[type] || {}).each do |package, files|
         next if ENV['PACKAGE'] && ENV['PACKAGE'] != package
+        STDOUT.puts 'c'
         if files
           # Generate file hashes
           hashes = files.inject([]) do |array, file|
@@ -48,17 +50,22 @@ class SmartAsset
             array
           end
           next if hashes.empty?
+
+          STDOUT.puts 'd'
           
           # Modified hash
           hash = Digest::SHA1.hexdigest(hashes.join)[0..7]
           
           # Package path
           package = "#{dest}/#{hash}_#{package}.#{ext}"
+
+          STDOUT.puts 'e'
           
           # If package file exists
           if File.exists?(package)
             packages << package
           else
+            STDOUT.puts 'f'
             data = []
             
             # Join files in package
@@ -71,6 +78,8 @@ class SmartAsset
             # Don't create new compressed file if no data
             data = data.join("\n")
             next if data.strip.empty?
+
+            STDOUT.puts 'g'
             
             # Compress joined files
             tmp = "#{dest}/tmp.#{ext}"
@@ -78,10 +87,14 @@ class SmartAsset
             puts "\nCreating #{package}..."
             warning = ENV['WARN'] ? " -v" : nil
 
+            STDOUT.puts 'h'
+
             unless @bin
               @bin = Dir.chdir(@root) { `npm bin`.strip }
               @bin = File.directory?(@bin) ? "#{@bin}/" : nil
             end
+
+            STDOUT.puts 'i'
             
             if ext == 'js'
               cmd = "#{@bin}uglifyjs --output #{package}#{warning} #{tmp}"
@@ -91,6 +104,8 @@ class SmartAsset
             puts cmd if ENV['DEBUG']
             `#{cmd}`
             FileUtils.rm(tmp) unless ENV['DEBUG']
+
+            STDOUT.puts 'j'
             
             # Fix YUI compression issue
             if ext == 'css'
@@ -100,17 +115,23 @@ class SmartAsset
                 `sed -i 's/ and(/ and (/g' #{package}`
               end
             end
+
+            STDOUT.puts 'k'
             
             # Package created
             packages << package
           end
         end
       end
+
+      STDOUT.puts 'l'
       
       # Remove old/unused packages
       (Dir["#{dest}/#{"[^_]"*8}_*.#{ext}"] - packages).each do |path|
         FileUtils.rm path
       end
+
+      STDOUT.puts 'm'
       
       # Delete legacy files
       Dir["#{dest}/*.yml", "#{dest}/#{"[0-9]"*14}_*.{css,js}"].each do |path|
