@@ -73,17 +73,18 @@ class SmartAsset
             tmp = "#{dest}/tmp.#{ext}"
             File.open(tmp, 'w') { |f| f.write(data) }
             puts "\nCreating #{package}..."
-            warning = ENV['WARN'] ? " -v" : nil
 
-            unless @bin
-              @bin = Dir.chdir(@root) { `npm bin`.strip }
-              @bin = File.directory?(@bin) ? "#{@bin}/" : nil
-            end
+            # Binary paths
+            bin      = File.expand_path(File.dirname(__FILE__) + '/../bin')
+            compiler = bin + '/compiler.jar'
+            yui      = bin + '/yui.jar'
             
             if ext == 'js'
-              cmd = "#{@bin}uglifyjs --output #{package}#{warning} #{tmp}"
+              warning = ENV['WARN'] ? nil : " --warning_level QUIET"
+              cmd = "java -jar #{compiler} --js #{tmp} --js_output_file #{package}#{warning}"
             elsif ext == 'css'
-              cmd = "#{@bin}cleancss --skip-advanced #{tmp} -o #{package}"
+              warning = ENV['WARN'] ? " -v" : nil
+              cmd = "java -jar #{yui} #{tmp} -o #{package}#{warning}"
             end
 
             puts cmd if ENV['DEBUG']
