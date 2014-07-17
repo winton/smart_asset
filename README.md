@@ -10,9 +10,9 @@ Features
 
 Similar to <code>AssetPackager</code>, but with the following changes:
 
-* Uses file size and super fast hashing ([Murmur3](https://github.com/PeterScott/murmur3)) to determine if a new compressed package should be created
-* [uglify-js](https://github.com/mishoo/UglifyJS) for javascript compression
-* [clean-css](https://github.com/GoalSmashers/clean-css) for css compression
+* Uses file size and hashing to determine if a new compressed package should be created
+* Closure Compiler for javascript compression
+* YUI Compressor for css compression
 * Framework agnostic (adapters provided for Rails 2, Rails 3, Sinatra, and Stasis)
 
 <a name="installation"></a>
@@ -24,12 +24,6 @@ Installation
 
 <pre>
 gem install smart_asset
-</pre>
-
-### Install npm packages
-
-<pre>
-npm install uglify-js clean-css -g
 </pre>
 
 ### Install 
