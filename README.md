@@ -86,9 +86,7 @@ Create Packaged Assets
 smart_asset
 </pre>
 
-If your project is Git version controlled, only the assets that have changed are repackaged.
-
-Otherwise, all packages generate every time.
+Only the assets that have changed are repackaged.
 
 Include Packages in Your Template
 ---------------------------------
