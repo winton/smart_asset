@@ -1,76 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>SmartAsset by winton</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="SmartAsset : Smart asset packaging for Rails, Sinatra, and Stasis" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <title>SmartAsset</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>SmartAsset</h1>
-        <p>Smart asset packaging for Rails, Sinatra, and Stasis</p>
-        <p class="view"><a href="https://github.com/winton/smart_asset">View the Project on GitHub <small>winton/smart_asset</small></a></p>
-        <ul>
-          <li><a href="https://github.com/winton/smart_asset/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/winton/smart_asset/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/winton/smart_asset">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p>Similar to <a href="https://github.com/sbecker/asset_packager">AssetPackager</a>, but with the following changes:</p>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/winton/smart_asset">View on GitHub</a>
+
+          <h1 id="project_title">SmartAsset</h1>
+          <h2 id="project_tagline">Smart asset packaging for Rails, Sinatra, and Stasis</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/winton/smart_asset/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/winton/smart_asset/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Smart asset packaging for Rails, Sinatra, and Stasis.</p>
+
+<p><a href="http://travis-ci.org/winton/smart_asset"><img src="https://secure.travis-ci.org/winton/smart_asset.png" alt="Build Status"></a></p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<p>Similar to <code>AssetPackager</code>, but with the following changes:</p>
 
 <ul>
-<li>Uses file size and super fast hashing (<a href="https://github.com/PeterScott/murmur3">Murmur3</a>) to determine if a new compressed package should be created</li>
-<li>
-<a href="https://github.com/mishoo/UglifyJS">uglify-js</a> for javascript compression</li>
-<li>
-<a href="https://github.com/GoalSmashers/clean-css">clean-css</a> for css compression</li>
+<li>Uses file size and hashing to determine if a new compressed package should be created</li>
+<li>Closure Compiler for javascript compression</li>
+<li>YUI Compressor for css compression</li>
 <li>Framework agnostic (adapters provided for Rails 2, Rails 3, Sinatra, and Stasis)</li>
 </ul><p><a name="installation"></a></p>
 
-<h2>Installation</h2>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<h3>Install gem</h3>
+<h3>
+<a name="install-gem" class="anchor" href="#install-gem"><span class="octicon octicon-link"></span></a>Install gem</h3>
 
 <pre>
 gem install smart_asset
 </pre>
 
-<h3>Install npm packages</h3>
+<h3>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h3>
 
-<pre>
-npm install uglify-js clean-css -g
-</pre>
+<h3>
+<a name="rails-2" class="anchor" href="#rails-2"><span class="octicon octicon-link"></span></a>Rails 2</h3>
 
-<h3>Install</h3>
-
-<h3>Rails 2</h3>
-
-<h4>config/environment.rb</h4>
+<h4>
+<a name="configenvironmentrb" class="anchor" href="#configenvironmentrb"><span class="octicon octicon-link"></span></a>config/environment.rb</h4>
 
 <pre>
 config.gem 'smart_asset'
 </pre>
 
-<h3>Rails 3</h3>
+<h3>
+<a name="rails-3" class="anchor" href="#rails-3"><span class="octicon octicon-link"></span></a>Rails 3</h3>
 
-<h4>Gemfile</h4>
+<h4>
+<a name="gemfile" class="anchor" href="#gemfile"><span class="octicon octicon-link"></span></a>Gemfile</h4>
 
 <pre>
 gem 'smart_asset'
 </pre>
 
-<h3>Sinatra</h3>
+<h3>
+<a name="sinatra" class="anchor" href="#sinatra"><span class="octicon octicon-link"></span></a>Sinatra</h3>
 
 <pre>
 require 'sinatra/base'
@@ -81,9 +92,11 @@ class Application &lt; Sinatra::Base
 end
 </pre>
 
-<h2>Create Configuration File</h2>
+<h2>
+<a name="create-configuration-file" class="anchor" href="#create-configuration-file"><span class="octicon octicon-link"></span></a>Create Configuration File</h2>
 
-<h3>config/assets.yml</h3>
+<h3>
+<a name="configassetsyml" class="anchor" href="#configassetsyml"><span class="octicon octicon-link"></span></a>config/assets.yml</h3>
 
 <pre>
 javascripts:
@@ -102,7 +115,8 @@ stylesheets:
 
 <p>By default, SmartAsset will look for assets in <code>public/javascripts</code> and <code>public/stylesheets</code>.</p>
 
-<h2>Create Packaged Assets</h2>
+<h2>
+<a name="create-packaged-assets" class="anchor" href="#create-packaged-assets"><span class="octicon octicon-link"></span></a>Create Packaged Assets</h2>
 
 <p><code>cd</code> to your project and run</p>
 
@@ -110,18 +124,18 @@ stylesheets:
 smart_asset
 </pre>
 
-<p>If your project is Git version controlled, only the assets that have changed are repackaged.</p>
+<p>Only the assets that have changed are repackaged.</p>
 
-<p>Otherwise, all packages generate every time.</p>
-
-<h2>Include Packages in Your Template</h2>
+<h2>
+<a name="include-packages-in-your-template" class="anchor" href="#include-packages-in-your-template"><span class="octicon octicon-link"></span></a>Include Packages in Your Template</h2>
 
 <pre>
 &lt;%= javascript_include_merged :package_1, :package_2 %&gt;
 &lt;%= stylesheet_link_merged :package_1, :package_2 %&gt;
 </pre>
 
-<h2>Migrating from AssetPackager</h2>
+<h2>
+<a name="migrating-from-assetpackager" class="anchor" href="#migrating-from-assetpackager"><span class="octicon octicon-link"></span></a>Migrating from AssetPackager</h2>
 
 <ul>
 <li><code>rm vendor/plugins/asset_packager</code></li>
@@ -130,9 +144,11 @@ smart_asset
 </li>
 <li>Instead of running <code>rake asset:packager:build_all</code>, run <code>smart_asset</code>
 </li>
-</ul><h2>Other Options</h2>
+</ul><h2>
+<a name="other-options" class="anchor" href="#other-options"><span class="octicon octicon-link"></span></a>Other Options</h2>
 
-<h3>config/assets.yml</h3>
+<h3>
+<a name="configassetsyml-1" class="anchor" href="#configassetsyml-1"><span class="octicon octicon-link"></span></a>config/assets.yml</h3>
 
 <p>You may add extra options to your <code>config/assets.yml</code> file.</p>
 
@@ -164,7 +180,8 @@ sources:
   stylesheets: stylesheets
 </pre>
 
-<h3>smart_asset</h3>
+<h3>
+<a name="smart_asset" class="anchor" href="#smart_asset"><span class="octicon octicon-link"></span></a>smart_asset</h3>
 
 <p>You may use environment variables with the <code>smart_asset</code> command to alter its behavior.</p>
 
@@ -174,15 +191,17 @@ sources:
 
 <p><code>MODIFIED='12/1/2010 12:00'</code><br>Use a default modified time other than Time.now for non-version controlled files</p>
 
-<p><code>WARN=1</code><br>Get compression warnings from UglifyJS and YUI Compressor</p>
+<p><code>WARN=1</code><br>Get compression warnings</p>
 
-<h4>Example:</h4>
+<h4>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example:</h4>
 
 <pre>
 WARN=1 smart_asset
 </pre>
 
-<h2>Running Specs</h2>
+<h2>
+<a name="running-specs" class="anchor" href="#running-specs"><span class="octicon octicon-link"></span></a>Running Specs</h2>
 
 <p>Forks and contributions to this project are much appreciated, but please make sure the specs run!</p>
 
@@ -199,11 +218,16 @@ spec/run
 </pre>
       </section>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/winton">winton</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">SmartAsset maintained by <a href="https://github.com/winton">winton</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
     
+
   </body>
 </html>
